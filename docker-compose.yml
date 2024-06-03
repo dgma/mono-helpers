@@ -1,0 +1,19 @@
+version: "3.7"
+
+services:
+  automation-node:
+    hostname: automation-node
+    image: automation-node
+    restart: always
+    build:
+      context: .
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "100m"
+    environment:
+      - NODE_PK=${NODE_PK}
+      - RPC=${RPC}
+      - WS_RPC=${WS_RPC}
+      - NETWORK=${NETWORK}
