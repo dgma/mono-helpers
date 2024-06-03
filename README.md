@@ -1,16 +1,6 @@
-[![Quality gate](https://github.com/dgma/automation-node-starter/actions/workflows/quality-gate.yml/badge.svg)](https://github.com/dgma/automation-node-starter/actions/workflows/quality-gate.yml)
+# Hade balancer
 
-# automation-node-starter
-
-Development starter kit for node.js ts web3 automation nodes
-
-## Features
-
-- Typescript & ts-node
-- Jest for unit testing
-- linters, code formatter, pre-commit and pre-push hooks
-- Docker & Docker-compose example
-- Custom github action and quality gate workflow for fast CI strategy implementation
+Node.js app for hade markets balancing and arbitrage
 
 ## Requirements
 
