@@ -1,8 +1,6 @@
 name: Quality gate
 on:
   push:
-    branches-ignore:
-      - "main"
 
 permissions:
   contents: read
@@ -25,11 +23,6 @@ jobs:
       - name: Run unit tests
         run: npm run test
   build:
-    env:
-      NODE_PK: "0x0000000000000000000000000000000000000000000000000000000000000000"
-      RPC: "https://rpc.com"
-      WS_RPC: "wss://ethereum.publicnode.com"
-      NETWORK: "mainnet"
     needs: test
     runs-on: ubuntu-latest
     steps:
