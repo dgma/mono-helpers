@@ -1,6 +1,6 @@
 {
   "name": "mono-helpers",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Web3 helpers CLI",
   "repository": {
     "type": "git",
@@ -12,11 +12,11 @@
   "homepage": "https://github.com/dgma/mono-helpers#readme",
   "keywords": [
     "cli",
-    "api",
-    "bot",
     "ccxt",
     "crypto",
-    "web3"
+    "web3",
+    "bitcoin",
+    "wallet generation"
   ],
   "author": "Dzmitry Lahunouski",
   "license": "SEE LICENSE IN LICENSE",
