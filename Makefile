@@ -1,12 +1,12 @@
 -include .env
 
-.PHONY: init build clear lint typecheck test pre-commit pre-push dev list example
+.PHONY: init build clear lint typecheck test pre-commit pre-push dev list wallet tx
 
 all: init clean typecheck test
 
 init:; npm i
 
-typecheck :; npx tsc
+typecheck :; npx tsc --project tsconfig.json
 
 clean :; rm -rf dist
 
@@ -25,5 +25,7 @@ dev :; npx tsx src/cli/$(cmd).ts
 list :; node --import tsx/esm src/cli/list.ts
 
 wallet :; node --import tsx/esm src/cli/wallet.ts
+
+tx :; node --import tsx/esm src/cli/tx.ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external

@@ -1,5 +1,5 @@
 import { input, confirm } from "@inquirer/prompts";
-import { generateWallet, supportedNetworks, Networks } from "../packages/wallet";
+import { generateWallet, supportedNetworks, Networks } from "src/packages/wallet";
 
 const parseNetworks = (networks: string) => networks.split(",").filter((i) => i);
 

@@ -2,12 +2,12 @@ import fs from "fs";
 import * as bip39 from "bip39";
 import { genBtc } from "./btc";
 import { genTia, genAtom } from "./cosmos";
-import { genEth } from "./eth";
+import { genEVM } from "./evm";
 import { genSol } from "./sol";
 
 const networksMap = {
   btc: genBtc,
-  evm: genEth,
+  evm: genEVM,
   sol: genSol,
   tia: genTia,
   atom: genAtom,

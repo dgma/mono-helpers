@@ -6,6 +6,7 @@
     "strict": true,
     "isolatedModules": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "noEmit": true,
     "outDir": "./dist",
     "resolveJsonModule": true,
