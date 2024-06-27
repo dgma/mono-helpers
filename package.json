@@ -31,6 +31,7 @@
     "@commander-js/extra-typings": "^12.1.0",
     "@cosmjs/crypto": "^0.32.3",
     "@cosmjs/encoding": "^0.32.3",
+    "@inquirer/prompts": "^5.0.7",
     "@scure/bip32": "^1.4.0",
     "bip32": "^4.0.0",
     "bip39": "^3.1.0",

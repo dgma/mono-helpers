@@ -5,9 +5,6 @@ import { genTia, genAtom } from "./cosmos";
 import { genEth } from "./eth";
 import { genSol } from "./sol";
 
-const amount = Number(process.env.AMOUNT) || 1;
-const networks = process.env.NETWORKS;
-
 const networksMap = {
   btc: genBtc,
   evm: genEth,
@@ -16,11 +13,9 @@ const networksMap = {
   atom: genAtom,
 };
 
-type Networks = keyof typeof networksMap;
+export type Networks = keyof typeof networksMap;
 
-const parsedNetworks = networks ? networks.split(",").filter((i) => i) : Object.keys(networksMap);
-
-console.log("generate for", parsedNetworks);
+export const supportedNetworks = Object.keys(networksMap) as Networks[];
 
 interface NetworkWallet {
   address?: string;
@@ -30,19 +25,19 @@ type Wallet = {
   [key in Networks]: NetworkWallet;
 } & { mnemonicᵻ: string };
 
-const generate = () =>
+const generate = (amount: number, networks: Networks[]) =>
   Array.from({ length: amount }).reduce((acc: Wallet[]) => {
     const mnemonic = bip39.generateMnemonic();
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     acc.push({
-      ...genAll(seed),
+      ...genAll(seed, networks),
       mnemonicᵻ: mnemonic,
     });
     return acc;
   }, []);
 
-const genAll = (seed: Buffer) =>
-  (parsedNetworks as Networks[]).reduce(
+const genAll = (seed: Buffer, networks: Networks[]) =>
+  networks.reduce(
     (acc, ntw) => {
       acc[ntw] = networksMap[ntw](seed);
       return acc;
@@ -50,8 +45,8 @@ const genAll = (seed: Buffer) =>
     {} as Record<Networks, NetworkWallet>,
   );
 
-const extractPublicData = (wallet: Wallet) =>
-  (parsedNetworks as Networks[]).reduce(
+const extractPublicData = (networks: Networks[]) => (wallet: Wallet) =>
+  networks.reduce(
     (acc, ntw) => {
       acc[ntw] = wallet[ntw].address;
       return acc;
@@ -59,8 +54,8 @@ const extractPublicData = (wallet: Wallet) =>
     {} as Record<Networks, NetworkWallet["address"]>,
   );
 
-export const generateWallet = () => {
-  const data = generate();
+export const generateWallet = (amount: number, networks: Networks[]) => {
+  const data = generate(amount, networks);
   fs.writeFileSync(".wallets.json", JSON.stringify(data, null, 2));
-  fs.writeFileSync(".wallets.pub.json", JSON.stringify(data.map(extractPublicData), null, 2));
+  fs.writeFileSync(".wallets.pub.json", JSON.stringify(data.map(extractPublicData(networks)), null, 2));
 };
