@@ -2,13 +2,6 @@
   "name": "mono-helpers",
   "version": "0.0.1",
   "description": "Web3 helpers CLI",
-  "scripts": {
-    "build": "tsc",
-    "test": "jest --passWithNoTests",
-    "lint": "eslint src/**/*.ts",
-    "prepare": "husky install",
-    "typecheck": "tsc --noEmit --project ./tsconfig.json"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dgma/mono-helpers.git"
@@ -30,6 +23,10 @@
   "engines": {
     "node": ">=20.11.0"
   },
+  "type": "module",
+  "scripts": {
+    "prepare": "husky install"
+  },
   "dependencies": {
     "@commander-js/extra-typings": "^12.1.0",
     "@cosmjs/crypto": "^0.32.3",
@@ -42,9 +39,11 @@
     "dotenv": "^16.4.5",
     "ecpair": "^2.1.0",
     "ethers": "^6.13.0",
-    "micro-key-producer": "github:killroy192/micro-key-producer#feat/application",
+    "micro-key-producer": "^0.7.0",
     "micro-sol-signer": "^0.4.2",
-    "tiny-secp256k1": "^2.2.3"
+    "tiny-secp256k1": "^2.2.3",
+    "tsx": "^4.15.7",
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -64,10 +63,7 @@
     "husky": "^9.0.11",
     "jest": "^29.7.0",
     "lint-staged": "^15.2.5",
-    "nodemon": "^3.1.0",
     "prettier": "^3.3.0",
-    "ts-jest": "^29.1.4",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.4.5"
+    "ts-jest": "^29.1.4"
   }
 }

@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/no-unresolved
-import { HDKey } from "micro-key-producer/cjs/slip10";
+import { HDKey } from "micro-key-producer/slip10.js";
 import { getAddress } from "micro-sol-signer";
 
 export const genSol = (seed: Buffer) => {

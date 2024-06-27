@@ -1,17 +1,29 @@
 -include .env
 
-.PHONY: init build clear list example
+.PHONY: init build clear lint typecheck test pre-commit pre-push dev list example
+
+all: init clean typecheck test
 
 init:; npm i
 
-build :; rm -rf dist; npx tsc
+typecheck :; npx tsc
 
-clear :; rm -rf dist
+clean :; rm -rf dist
 
-list :; node dist/cli/list.js
+lint :; npx eslint src/**/*.ts
 
-example :; node dist/cli/example.cli.js
+lint-stg :; npx lint-staged
 
-dev :; npx nodemon src/cli/$(cmd).ts
+test :; npx jest --passWithNoTests
+
+pre-commit: typecheck lint-stg
+pre-push : lint typecheck test
+
+dev :; npx tsx src/cli/$(cmd).ts
+
+# commands
+list :; node --import tsx/esm src/cli/list.ts
+
+example :; node --import tsx/esm src/cli/example.ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external
