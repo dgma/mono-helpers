@@ -12,8 +12,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - run: npm run typecheck;
-      - run: npm run lint
+      - run: make typecheck;
+      - run: make lint
   test:
     needs: lint
     runs-on: ubuntu-latest
