@@ -24,6 +24,6 @@ dev :; npx tsx src/cli/$(cmd).ts
 # commands
 list :; node --import tsx/esm src/cli/list.ts
 
-example :; node --import tsx/esm src/cli/example.ts
+wallet :; node --import tsx/esm src/cli/wallet.ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external
