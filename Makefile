@@ -28,4 +28,6 @@ wallet :; node --import tsx/esm src/cli/wallet.ts
 
 tx :; node --import tsx/esm src/cli/tx.ts
 
+scroll-report :; node --import tsx/esm src/cli/scroll-report.ts
+
 -include ${FCT_PLUGIN_PATH}/makefile-external
