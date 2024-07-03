@@ -23,4 +23,6 @@ export async function refreshProxy() {
   refreshProxyAgent();
   const res = await axios.get(proxyConfig().rebootURL, { timeout: 120000, headers, httpsAgent });
   console.log(`res ${res.data}`);
+
+  return axiosInstance();
 }
