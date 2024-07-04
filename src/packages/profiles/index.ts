@@ -16,17 +16,6 @@ const networksMap = {
 
 export const supportedNetworks = Object.keys(networksMap) as Networks[];
 
-const generate = (amount: number, networks: Networks[]) =>
-  Array.from({ length: amount }).reduce((acc: Profile, _, i) => {
-    const mnemonic = bip39.generateMnemonic();
-    const seed = bip39.mnemonicToSeedSync(mnemonic);
-    acc[i] = {
-      mnemonicᵻ: mnemonic,
-      wallets: genAll(seed, networks),
-    };
-    return acc;
-  }, {});
-
 const genAll = (seed: Buffer, networks: Networks[]) =>
   networks.reduce(
     (acc, ntw) => {
@@ -36,7 +25,38 @@ const genAll = (seed: Buffer, networks: Networks[]) =>
     {} as Record<Networks, NetworkWallet>,
   );
 
-export const generateWallet = (amount: number, networks: Networks[]) => {
-  const data = generate(amount, networks);
-  fs.writeFileSync(".profiles.json", JSON.stringify(data, null, 2));
+const generateAndSave = (mnemonics: string[], networks: Networks[]) => {
+  const addProfiles = fs.existsSync(".profiles.json");
+  const profiles = addProfiles ? (JSON.parse(fs.readFileSync(".profiles.json", "utf-8")) as Profile) : {};
+  const offsetIndex = addProfiles ? Number(Object.keys(profiles).sort((a, b) => Number(b) - Number(a))[0]) + 1 : 0;
+  const data = mnemonics.reduce((acc: Profile, mnemonic, i) => {
+    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    acc[i + offsetIndex] = {
+      mnemonicᵻ: mnemonic,
+      wallets: genAll(seed, networks),
+    };
+    return acc;
+  }, {});
+  fs.writeFileSync(
+    ".profiles.json",
+    JSON.stringify(
+      {
+        ...profiles,
+        ...data,
+      },
+      null,
+      2,
+    ),
+  );
+};
+
+export const createProfiles = (amount: number, networks: Networks[]) => {
+  generateAndSave(
+    Array.from({ length: amount }).map(() => bip39.generateMnemonic()),
+    networks,
+  );
+};
+
+export const recoverProfiles = (networks: Networks[]) => {
+  generateAndSave(JSON.parse(fs.readFileSync(".mnemonics.json", "utf-8")) as string[], networks);
 };

@@ -18,7 +18,7 @@ const httpsAgent = new https.Agent({
 
 export async function refreshProxy() {
   const timePassed = Date.now() - currentTime();
-  const waitTime = 5000 - timePassed;
+  const waitTime = 8000 - timePassed;
   console.log(`wait ${waitTime}`);
   await sleep(waitTime);
   await logIpInfo(axiosInstance());
