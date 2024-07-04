@@ -8,7 +8,7 @@ import { Profile, Wallet } from "src/types/profile";
 
 type LegacyWallet = Wallet & { mnemonicᵻ?: string };
 
-const wallets = JSON.parse(readFileSync(resolve(".", ".wallet.json"), "utf-8")) as LegacyWallet[];
+const wallets = JSON.parse(readFileSync(resolve(".", ".wallets.json"), "utf-8")) as LegacyWallet[];
 
 const profile = wallets.reduce((acc: Profile, item, i) => {
   const mn = item["mnemonicᵻ"]!;

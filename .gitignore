@@ -25,3 +25,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 .profiles.json
+.wallets.json
+reports/
