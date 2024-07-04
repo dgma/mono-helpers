@@ -1,5 +1,6 @@
 import { input, confirm } from "@inquirer/prompts";
-import { generateWallet, supportedNetworks, Networks } from "src/packages/wallet";
+import { generateWallet, supportedNetworks } from "src/packages/profiles";
+import { Networks } from "src/types/profile";
 
 const parseNetworks = (networks: string) => networks.split(",").filter((i) => i);
 

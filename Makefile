@@ -21,10 +21,12 @@ pre-push : lint typecheck test
 
 dev :; npx tsx src/cli/$(cmd).ts
 
+migrate :; npx tsx src/migrations/$(cmd).ts
+
 # commands
 list :; node --import tsx/esm src/cli/list.ts
 
-wallet :; node --import tsx/esm src/cli/wallet.ts
+profiles :; node --import tsx/esm src/cli/profiles.ts
 
 tx :; node --import tsx/esm src/cli/tx.ts
 

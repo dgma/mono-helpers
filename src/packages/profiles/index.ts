@@ -4,6 +4,7 @@ import { genBtc } from "./btc";
 import { genTia, genAtom } from "./cosmos";
 import { genEVM } from "./evm";
 import { genSol } from "./sol";
+import { Networks, Profile, NetworkWallet } from "src/types/profile";
 
 const networksMap = {
   btc: genBtc,
@@ -13,28 +14,18 @@ const networksMap = {
   atom: genAtom,
 };
 
-export type Networks = keyof typeof networksMap;
-
 export const supportedNetworks = Object.keys(networksMap) as Networks[];
 
-interface NetworkWallet {
-  address?: string;
-  pkᵻ: string;
-}
-type Wallet = {
-  [key in Networks]: NetworkWallet;
-} & { mnemonicᵻ: string };
-
 const generate = (amount: number, networks: Networks[]) =>
-  Array.from({ length: amount }).reduce((acc: Wallet[]) => {
+  Array.from({ length: amount }).reduce((acc: Profile, _, i) => {
     const mnemonic = bip39.generateMnemonic();
     const seed = bip39.mnemonicToSeedSync(mnemonic);
-    acc.push({
-      ...genAll(seed, networks),
+    acc[i] = {
       mnemonicᵻ: mnemonic,
-    });
+      wallets: genAll(seed, networks),
+    };
     return acc;
-  }, []);
+  }, {});
 
 const genAll = (seed: Buffer, networks: Networks[]) =>
   networks.reduce(
@@ -45,17 +36,7 @@ const genAll = (seed: Buffer, networks: Networks[]) =>
     {} as Record<Networks, NetworkWallet>,
   );
 
-const extractPublicData = (networks: Networks[]) => (wallet: Wallet) =>
-  networks.reduce(
-    (acc, ntw) => {
-      acc[ntw] = wallet[ntw].address;
-      return acc;
-    },
-    {} as Record<Networks, NetworkWallet["address"]>,
-  );
-
 export const generateWallet = (amount: number, networks: Networks[]) => {
   const data = generate(amount, networks);
-  fs.writeFileSync(".wallets.json", JSON.stringify(data, null, 2));
-  fs.writeFileSync(".wallets.pub.json", JSON.stringify(data.map(extractPublicData(networks)), null, 2));
+  fs.writeFileSync(".profiles.json", JSON.stringify(data, null, 2));
 };
