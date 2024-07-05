@@ -28,3 +28,4 @@ yarn-error.log*
 .wallets.json
 .mnemonics.json
 reports/
+!src/**/*
