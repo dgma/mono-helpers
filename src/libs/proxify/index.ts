@@ -16,9 +16,9 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
 });
 
-export async function refreshProxy() {
+export async function refreshProxy(minWait = 10000) {
   const timePassed = Date.now() - currentTime();
-  const waitTime = 8000 - timePassed;
+  const waitTime = minWait - timePassed;
   console.log(`wait ${waitTime}`);
   await sleep(waitTime);
   await logIpInfo(axiosInstance());
