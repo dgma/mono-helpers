@@ -1,4 +1,5 @@
-import { input, confirm } from "@inquirer/prompts";
+import { input, confirm, password } from "@inquirer/prompts";
+import { validateMKey } from "src/libs/validations";
 import { recoverProfiles, supportedNetworks } from "src/packages/profiles";
 import { Networks } from "src/types/profile";
 
@@ -15,7 +16,8 @@ const getNetworks = async (message = "enter networks separated by comma, aka btc
 };
 
 (async function main() {
+  const masterKey = await password({ message: "enter encryption master key", mask: false }).then(validateMKey);
   const defaultNetworks = await confirm({ message: "generate for all networks?", default: true });
   const networks = defaultNetworks ? supportedNetworks : await getNetworks();
-  return recoverProfiles(networks);
+  return recoverProfiles(networks, masterKey);
 })();

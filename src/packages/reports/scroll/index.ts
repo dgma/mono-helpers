@@ -7,8 +7,6 @@ import { accountPoints } from "./points";
 import { refreshProxy } from "src/libs/proxify";
 import { Profile } from "src/types/profile";
 
-const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
-
 const refreshAndCall = (index: string, address: string) => async (report: any) => {
   try {
     const axiosInstance = await refreshProxy(60000);
@@ -35,6 +33,8 @@ const refreshAndCall = (index: string, address: string) => async (report: any) =
 };
 
 export async function report(save: boolean) {
+  const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
+
   const finalReport = await Object.entries(profiles).reduce(
     (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address!)),
     Promise.resolve({}),

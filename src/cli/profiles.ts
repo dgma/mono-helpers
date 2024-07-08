@@ -1,4 +1,5 @@
-import { input, confirm } from "@inquirer/prompts";
+import { input, confirm, password } from "@inquirer/prompts";
+import { validateMKey, validateProfileAmount } from "src/libs/validations";
 import { createProfiles, supportedNetworks } from "src/packages/profiles";
 import { Networks } from "src/types/profile";
 
@@ -15,8 +16,9 @@ const getNetworks = async (message = "enter networks separated by comma, aka btc
 };
 
 (async function main() {
-  const amount = Number(await input({ message: "enter amount of wallets to generate" }));
+  const amount = await input({ message: "enter amount of wallets to generate" }).then(validateProfileAmount);
+  const masterKey = await password({ message: "enter encryption master key", mask: false }).then(validateMKey);
   const defaultNetworks = await confirm({ message: "generate for all networks?", default: true });
   const networks = defaultNetworks ? supportedNetworks : await getNetworks();
-  return createProfiles(amount, networks);
+  return createProfiles(amount, networks, masterKey);
 })();

@@ -5,6 +5,10 @@
     "jest": true,
   },
 
+  "globals": {
+    "BufferEncoding": "readonly",
+  },
+
   "root": true,
 
   "plugins": ["@typescript-eslint", "json", "promise", "import", "prettier"],

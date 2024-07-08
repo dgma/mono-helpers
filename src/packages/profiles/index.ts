@@ -4,6 +4,7 @@ import { genBtc } from "./btc";
 import { genTia, genAtom } from "./cosmos";
 import { genEVM } from "./evm";
 import { genSol } from "./sol";
+import { encryptMarkedFields } from "src/libs/crypt";
 import { Networks, Profile, NetworkWallet } from "src/types/profile";
 
 const networksMap = {
@@ -25,18 +26,21 @@ const genAll = (seed: Buffer, networks: Networks[]) =>
     {} as Record<Networks, NetworkWallet>,
   );
 
-const generateAndSave = (mnemonics: string[], networks: Networks[]) => {
+const generateAndSave = (mnemonics: string[], networks: Networks[], masterKey: string) => {
   const addProfiles = fs.existsSync(".profiles.json");
   const profiles = addProfiles ? (JSON.parse(fs.readFileSync(".profiles.json", "utf-8")) as Profile) : {};
   const offsetIndex = addProfiles ? Number(Object.keys(profiles).sort((a, b) => Number(b) - Number(a))[0]) + 1 : 0;
-  const data = mnemonics.reduce((acc: Profile, mnemonic, i) => {
+  const data = mnemonics.reduce((acc, mnemonic, i) => {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
-    acc[i + offsetIndex] = {
-      mnemonicᵻ: mnemonic,
-      wallets: genAll(seed, networks),
-    };
+    acc[i + offsetIndex] = encryptMarkedFields(
+      {
+        mnemonicᵻ: mnemonic,
+        wallets: genAll(seed, networks),
+      },
+      masterKey,
+    ) as Profile[string];
     return acc;
-  }, {});
+  }, {} as Profile);
   fs.writeFileSync(
     ".profiles.json",
     JSON.stringify(
@@ -50,13 +54,14 @@ const generateAndSave = (mnemonics: string[], networks: Networks[]) => {
   );
 };
 
-export const createProfiles = (amount: number, networks: Networks[]) => {
+export const createProfiles = (amount: number, networks: Networks[], masterKey: string) => {
   generateAndSave(
     Array.from({ length: amount }).map(() => bip39.generateMnemonic()),
     networks,
+    masterKey,
   );
 };
 
-export const recoverProfiles = (networks: Networks[]) => {
-  generateAndSave(JSON.parse(fs.readFileSync(".mnemonics.json", "utf-8")) as string[], networks);
+export const recoverProfiles = (networks: Networks[], masterKey: string) => {
+  generateAndSave(JSON.parse(fs.readFileSync(".mnemonics.json", "utf-8")) as string[], networks, masterKey);
 };
