@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 // import axiosRetry from "axios-retry";
-import { getContract, zeroAddress } from "viem";
+import { getContract, zeroAddress, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { abi } from "./abi";
@@ -47,7 +47,13 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
 
   const userBalance = await contract.read.getBalance([account.address, zeroAddress]);
 
-  console.log("userBalance", userBalance);
+  console.log("userBalance in fuel sk", userBalance);
+
+  const balance = await publicClient.getBalance({
+    address: account.address,
+  });
+
+  console.log("userBalance in wallet", formatEther(balance));
 
   /**
    * 0. check wether deposit has been made
