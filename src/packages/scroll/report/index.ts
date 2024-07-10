@@ -9,7 +9,7 @@ import { Profile } from "src/types/profile";
 
 const refreshAndCall = (index: string, address: string) => async (report: any) => {
   try {
-    const axiosInstance = await refreshProxy(20000);
+    const axiosInstance = await refreshProxy();
 
     axiosRetry(axiosInstance, {
       retries: 3,

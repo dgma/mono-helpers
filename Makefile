@@ -30,7 +30,7 @@ profiles :; node --import tsx/esm src/cli/profiles.ts
 
 recover :; node --import tsx/esm src/cli/recover.ts
 
-tx :; node --import tsx/esm src/cli/tx.ts
+fuel :; node --import tsx/esm src/cli/fuel.ts
 
 report :; node --import tsx/esm src/cli/report.ts
 

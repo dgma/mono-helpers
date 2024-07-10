@@ -9,7 +9,7 @@ import Joi from "joi";
 export const validateMKey = (input: string) => {
   Joi.attempt(
     input,
-    Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$")).required(),
+    Joi.string().pattern(new RegExp("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{8,}$")).required(),
     "minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character",
   );
   return input;

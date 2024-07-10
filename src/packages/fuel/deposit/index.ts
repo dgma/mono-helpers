@@ -5,8 +5,9 @@ import { getContract, zeroAddress } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { abi } from "./abi";
+import { getClient, getPublicClient } from "src/libs/clients";
 import { decryptMarkedFields } from "src/libs/crypt";
-import { getClient } from "src/libs/local-evm-client";
+import { refreshProxy } from "src/libs/proxify";
 import { Profile } from "src/types/profile";
 
 // export async function tx(network: string) {
@@ -30,14 +31,18 @@ function getDecodedEVM(profiles: Profile, masterKey: string) {
 
 type EVMWallet = Profile["string"]["wallets"]["evm"];
 
-const checkAndDeposit = (client: ReturnType<typeof getClient>, evmWallet: EVMWallet) => async () => {
+const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   const pk = evmWallet.pkᵻ as `0x${string}`;
   const account = privateKeyToAccount(pk);
+
+  const axiosInstance = await refreshProxy();
+  const publicClient = getPublicClient(chains.mainnet);
+  const walletClient = getClient(chains.mainnet, axiosInstance);
 
   const contract = getContract({
     address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
     abi,
-    client,
+    client: { public: publicClient, wallet: walletClient },
   });
 
   const userBalance = await contract.read.getBalance([account.address, zeroAddress]);
@@ -54,9 +59,8 @@ const checkAndDeposit = (client: ReturnType<typeof getClient>, evmWallet: EVMWal
 
 export function deposit(masterKey: string) {
   const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
-  const client = getClient(chains.mainnet);
 
   return [getDecodedEVM(profiles, masterKey)[0]].reduce((promise, accountData) => {
-    return promise.then(checkAndDeposit(client, accountData));
+    return promise.then(checkAndDeposit(accountData));
   }, Promise.resolve());
 }
