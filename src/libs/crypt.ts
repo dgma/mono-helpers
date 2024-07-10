@@ -68,17 +68,21 @@ export function comparePasswords(storedPass: string, suppliedPass: string) {
 }
 
 type MixedObjectToCrypt = {
-  [prop: string]: string | MixedObjectToCrypt;
+  [prop: string]: string | MixedObjectToCrypt | null;
 };
 
 export const encryptMarkedFields = (value: MixedObjectToCrypt, masterKey: string) => {
   return Object.entries(value).reduce((acc: MixedObjectToCrypt, [key, value]) => {
-    if (typeof value === "object") {
-      acc[key] = encryptMarkedFields(value, masterKey);
-    } else if (key[key.length - 1] === marker) {
-      acc[key] = encrypt(value, masterKey);
-    } else {
-      acc[key] = value;
+    switch (true) {
+      case value && typeof value === "object":
+        acc[key] = encryptMarkedFields(value, masterKey);
+        break;
+      case typeof value === "string" && key[key.length - 1] === marker:
+        acc[key] = encrypt(value, masterKey);
+        break;
+      default:
+        acc[key] = value;
+        break;
     }
     return acc;
   }, {});
@@ -86,12 +90,16 @@ export const encryptMarkedFields = (value: MixedObjectToCrypt, masterKey: string
 
 export const decryptMarkedFields = (value: MixedObjectToCrypt, masterKey: string) => {
   return Object.entries(value).reduce((acc: MixedObjectToCrypt, [key, value]) => {
-    if (typeof value === "object") {
-      acc[key] = encryptMarkedFields(value, masterKey);
-    } else if (key[key.length - 1] === marker) {
-      acc[key] = encrypt(value, masterKey);
-    } else {
-      acc[key] = value;
+    switch (true) {
+      case typeof value === "object" && !!value:
+        acc[key] = decryptMarkedFields(value, masterKey);
+        break;
+      case typeof value === "string" && key[key.length - 1] === marker:
+        acc[key] = decrypt(value, masterKey);
+        break;
+      default:
+        acc[key] = value;
+        break;
     }
     return acc;
   }, {});

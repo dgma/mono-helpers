@@ -1,5 +1,10 @@
 import { confirm, select } from "@inquirer/prompts";
-import { reportExecutors } from "src/packages/reports";
+import { report as scrollReport } from "src/packages/scroll";
+
+export const reportExecutors = {
+  scroll: scrollReport,
+  symbolic: () => {},
+};
 
 (async function main() {
   const reportType: keyof typeof reportExecutors = await select({
