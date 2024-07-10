@@ -11,6 +11,8 @@ import { Profile } from "src/types/profile";
 
 type EVMWallet = Profile["string"]["wallets"]["evm"];
 
+const FUEL_DEPOSIT_CONTRACT = "0x19b5cc75846BF6286d599ec116536a333C4C2c14";
+
 const getDecodedEVM = (profiles: Profile, masterKey: string) =>
   Object.values(decryptMarkedFields(profiles, masterKey) as Profile).map(({ wallets }) => ({
     ...wallets.evm,
@@ -25,7 +27,7 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   const walletClient = getClient(chains.mainnet, axiosInstance);
 
   const userBalance = await publicClient.readContract({
-    address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
+    address: FUEL_DEPOSIT_CONTRACT,
     abi,
     functionName: "getBalance",
     account,
@@ -43,7 +45,7 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   if (userBalance === 0n && balance > 0n) {
     console.log("deposit");
     const gas = await publicClient.estimateContractGas({
-      address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
+      address: FUEL_DEPOSIT_CONTRACT,
       abi,
       functionName: "deposit",
       account,
@@ -51,7 +53,7 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
     });
 
     const { request } = await walletClient.simulateContract({
-      address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
+      address: FUEL_DEPOSIT_CONTRACT,
       abi,
       functionName: "deposit",
       args: [zeroAddress, 0n, 0],
