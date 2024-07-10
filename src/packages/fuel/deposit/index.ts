@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-// import axiosRetry from "axios-retry";
-import { getContract, zeroAddress, formatEther } from "viem";
+import { zeroAddress, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { abi } from "./abi";
@@ -10,26 +9,12 @@ import { decryptMarkedFields } from "src/libs/crypt";
 import { refreshProxy } from "src/libs/proxify";
 import { Profile } from "src/types/profile";
 
-// export async function tx(network: string) {
-//   const client = getClient(chains[network as SupportedNetworks] || chains.mainnet);
-//   const account = privateKeyToAccount("0xc7d9d44df8fa6567e30963cecc0d91b3b798c08ebdee6c30b66ad63dff0eece7");
+type EVMWallet = Profile["string"]["wallets"]["evm"];
 
-//   const hash = await client.sendTransaction({
-//     account,
-//     to: "0xa5cc3c03994DB5b0d9A5eEdD10CabaB0813678AC",
-//     value: parseEther("0.001"),
-//   });
-
-//   return hash;
-// }
-
-function getDecodedEVM(profiles: Profile, masterKey: string) {
-  return Object.values(decryptMarkedFields(profiles, masterKey) as Profile).map(({ wallets }) => ({
+const getDecodedEVM = (profiles: Profile, masterKey: string) =>
+  Object.values(decryptMarkedFields(profiles, masterKey) as Profile).map(({ wallets }) => ({
     ...wallets.evm,
   }));
-}
-
-type EVMWallet = Profile["string"]["wallets"]["evm"];
 
 const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   const pk = evmWallet.pkᵻ as `0x${string}`;
@@ -39,15 +24,15 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   const publicClient = getPublicClient(chains.mainnet);
   const walletClient = getClient(chains.mainnet, axiosInstance);
 
-  const contract = getContract({
+  const userBalance = await publicClient.readContract({
     address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
     abi,
-    client: { public: publicClient, wallet: walletClient },
+    functionName: "getBalance",
+    account,
+    args: [account.address, zeroAddress],
   });
 
-  const userBalance = await contract.read.getBalance([account.address, zeroAddress]);
-
-  console.log("userBalance in fuel sk", userBalance);
+  console.log("userBalance in fuel sk", formatEther(userBalance));
 
   const balance = await publicClient.getBalance({
     address: account.address,
@@ -55,12 +40,26 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
 
   console.log("userBalance in wallet", formatEther(balance));
 
-  /**
-   * 0. check wether deposit has been made
-   * 1. read account balance
-   * 2. identify tier
-   * 3. deposit
-   */
+  if (userBalance === 0n && balance > 0n) {
+    console.log("deposit");
+    const gas = await publicClient.estimateContractGas({
+      address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
+      abi,
+      functionName: "deposit",
+      account,
+      args: [zeroAddress, 0n, 0],
+    });
+
+    const { request } = await walletClient.simulateContract({
+      address: "0x19b5cc75846BF6286d599ec116536a333C4C2c14",
+      abi,
+      functionName: "deposit",
+      args: [zeroAddress, 0n, 0],
+      value: balance - gas,
+      account,
+    });
+    await walletClient.writeContract(request);
+  }
 };
 
 export function deposit(masterKey: string) {
