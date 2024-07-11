@@ -56,7 +56,6 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   const valueToDeposit = balance - gas;
 
   if (userBalanceInFuel === 0n && ethPrice * valueToDeposit >= parseEther("100")) {
-    /** Todo add timer randomization */
     const { request } = await walletClient.simulateContract({
       address: FUEL_POINTS_CONTRACT,
       abi: FUEL_POINTS_CONTRACT_ABI,
@@ -69,9 +68,14 @@ const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
   }
 };
 
-export function deposit(masterKey: string) {
+export function deposit(masterKey: string, medianDeposit: number) {
   const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
 
+  /**
+   * 1. collect data and make list of accounts to deposit
+   * 2. randomly send deposit amount withing range
+   */
+  console.log(medianDeposit);
   return [getDecodedEVM(profiles, masterKey)[0]].reduce((promise, accountData) => {
     return promise.then(checkAndDeposit(accountData));
   }, Promise.resolve());

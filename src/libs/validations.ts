@@ -15,7 +15,7 @@ export const validateMKey = (input: string) => {
   return input;
 };
 
-export const validateProfileAmount = (input: string) => {
+export const validatePositiveNumber = (input: string) => {
   Joi.attempt(Number(input), Joi.number().greater(0).required(), "positive number required");
   return Number(input);
 };
