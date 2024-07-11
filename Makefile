@@ -26,7 +26,7 @@ migrate :; npx tsx src/migrations/$(cmd).ts
 # commands
 list :; node --import tsx/esm src/cli/list.ts
 
-profiles :; node --import tsx/esm src/cli/profiles.ts
+profile :; node --import tsx/esm src/cli/profiles.ts
 
 recover :; node --import tsx/esm src/cli/recover.ts
 

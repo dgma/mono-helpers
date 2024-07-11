@@ -1,7 +1,9 @@
 # Prompt based Web3 Helpers
 
-- [Wallet generator](docs/wallet.md) for different chains
-- Transaction template executor (in progress)
+- [Profile generator](docs/profile.md) for different chains.
+- Mainnet eth balance.
+- [Scroll marks](https://scroll.io/sessions) & [NURI](https://www.nuri.exchange/swap) LP report
+- [Fuel Points](https://app.fuel.network/earn-points) farming with automatic ETH deposits
 
 All available commands: `make list`
 
@@ -14,6 +16,12 @@ All available commands: `make list`
 - [Make](https://www.gnu.org/software/make/manual/make.html)
 - Optional. [Docker](https://www.docker.com/)
   - You'll need to run docker if you want to use run production container builds locally
+
+## Installation
+
+```sh
+make profile
+```
 
 ## Contributing
 
