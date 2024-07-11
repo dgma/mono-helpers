@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { zeroAddress, formatEther, parseEther, PublicClient } from "viem";
+import { zeroAddress, parseEther, PublicClient } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "./constants";
@@ -34,27 +34,28 @@ const deposit = (wallet: EVMWallet, toDeposit: bigint) => async () => {
   await walletClient.writeContract(request);
 };
 
-const prepare = (publicClient: PublicClient, expenses: bigint, ethPrice: bigint) => async (wallet: EVMWallet) => {
-  const userBalanceInFuel = await publicClient.readContract({
+type PrepareFnParams = {
+  publicClient: PublicClient;
+  expenses: bigint;
+  ethPrice: bigint;
+  minDeposit: bigint;
+};
+
+const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
+  const userBalanceInFuel = await params.publicClient.readContract({
     address: FUEL_POINTS_CONTRACT,
     abi: FUEL_POINTS_CONTRACT_ABI,
     functionName: "getBalance",
     args: [wallet.address, zeroAddress],
   });
 
-  console.log("userBalance in fuel sk", formatEther(userBalanceInFuel));
-
-  const balance = await publicClient.getBalance({
+  const balance = await params.publicClient.getBalance({
     address: wallet.address,
   });
 
-  console.log("userBalance in wallet", formatEther(balance));
+  const toDeposit = balance - params.expenses;
 
-  console.log("user eth wallet balance in usd: ", formatEther(ethPrice * balance));
-
-  const toDeposit = balance - expenses;
-
-  const isEligible = userBalanceInFuel === 0n && ethPrice * toDeposit >= parseEther("100");
+  const isEligible = userBalanceInFuel === 0n && params.ethPrice * toDeposit >= params.minDeposit;
 
   return {
     wallet,
@@ -82,7 +83,7 @@ const getExpenses = async (publicClient: PublicClient) => {
   return depositCost + withdrawCost;
 };
 
-export async function initDeposits(masterKey: string, medianDeposit: number) {
+export async function initDeposits(masterKey: string, minDeposit: number) {
   const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
   const decodedEVMAccounts = getDecodedEVM(profiles, masterKey);
   const publicClient = getPublicClient(chains.mainnet);
@@ -90,9 +91,10 @@ export async function initDeposits(masterKey: string, medianDeposit: number) {
   const expenses = await getExpenses(publicClient);
   const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
 
-  const accountsToDeposit = await Promise.all(decodedEVMAccounts.map(prepare(publicClient, expenses, ethPrice)));
+  const accountsToDeposit = await Promise.all(
+    decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
+  );
 
-  console.log(medianDeposit);
   return accountsToDeposit.reduce((promise, { wallet, isEligible, toDeposit }) => {
     if (!isEligible) {
       return promise;

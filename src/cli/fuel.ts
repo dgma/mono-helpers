@@ -4,6 +4,6 @@ import { initDeposits } from "src/packages/fuel";
 
 (async function main() {
   const masterKey = await password({ message: "enter encryption master key", mask: false }).then(validateMKey);
-  const medianDeposit = await input({ message: "enter deposit median deposit in usd" }).then(validatePositiveNumber);
-  return initDeposits(masterKey, medianDeposit);
+  const minDeposit = await input({ message: "enter minimal usd deposit" }).then(validatePositiveNumber);
+  return initDeposits(masterKey, minDeposit);
 })();
