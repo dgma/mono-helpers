@@ -1,9 +1,10 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { zeroAddress, formatEther } from "viem";
+import { zeroAddress, formatEther, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
-import { abi } from "./abi";
+import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "./constants";
+import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
 import { decryptMarkedFields } from "src/libs/crypt";
 import { refreshProxy } from "src/libs/proxify";
@@ -11,53 +12,57 @@ import { Profile } from "src/types/profile";
 
 type EVMWallet = Profile["string"]["wallets"]["evm"];
 
-const FUEL_DEPOSIT_CONTRACT = "0x19b5cc75846BF6286d599ec116536a333C4C2c14";
-
 const getDecodedEVM = (profiles: Profile, masterKey: string) =>
   Object.values(decryptMarkedFields(profiles, masterKey) as Profile).map(({ wallets }) => ({
     ...wallets.evm,
   }));
 
 const checkAndDeposit = (evmWallet: EVMWallet) => async () => {
+  const chain = chains.mainnet;
   const pk = evmWallet.pkᵻ as `0x${string}`;
   const account = privateKeyToAccount(pk);
 
   const axiosInstance = await refreshProxy();
-  const publicClient = getPublicClient(chains.mainnet);
-  const walletClient = getClient(chains.mainnet, axiosInstance);
+  const publicClient = getPublicClient(chain);
+  const walletClient = getClient(chain, axiosInstance);
 
-  const userBalance = await publicClient.readContract({
-    address: FUEL_DEPOSIT_CONTRACT,
-    abi,
+  const userBalanceInFuel = await publicClient.readContract({
+    address: FUEL_POINTS_CONTRACT,
+    abi: FUEL_POINTS_CONTRACT_ABI,
     functionName: "getBalance",
-    account,
     args: [account.address, zeroAddress],
   });
 
-  console.log("userBalance in fuel sk", formatEther(userBalance));
+  console.log("userBalance in fuel sk", formatEther(userBalanceInFuel));
 
   const balance = await publicClient.getBalance({
     address: account.address,
   });
 
+  const gas = await publicClient.estimateContractGas({
+    address: FUEL_POINTS_CONTRACT,
+    abi: FUEL_POINTS_CONTRACT_ABI,
+    functionName: "deposit",
+    args: [zeroAddress, 0n, 0],
+    value: 10n,
+  });
+
   console.log("userBalance in wallet", formatEther(balance));
 
-  if (userBalance === 0n && balance > 0n) {
-    console.log("deposit");
-    const gas = await publicClient.estimateContractGas({
-      address: FUEL_DEPOSIT_CONTRACT,
-      abi,
-      functionName: "deposit",
-      account,
-      args: [zeroAddress, 0n, 0],
-    });
+  const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chain.id], 18);
 
+  console.log("user eth wallet balance in usd: ", formatEther(ethPrice * balance));
+
+  const valueToDeposit = balance - gas;
+
+  if (userBalanceInFuel === 0n && ethPrice * valueToDeposit >= parseEther("100")) {
+    /** Todo add timer randomization */
     const { request } = await walletClient.simulateContract({
-      address: FUEL_DEPOSIT_CONTRACT,
-      abi,
+      address: FUEL_POINTS_CONTRACT,
+      abi: FUEL_POINTS_CONTRACT_ABI,
       functionName: "deposit",
       args: [zeroAddress, 0n, 0],
-      value: balance - gas,
+      value: valueToDeposit,
       account,
     });
     await walletClient.writeContract(request);

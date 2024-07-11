@@ -30,11 +30,16 @@ const transport = (chain: chains.Chain, proxy?: AxiosInstance) => {
 
 export const getPublicClient = (chain: chains.Chain) =>
   createPublicClient({
+    batch: {
+      multicall: {
+        wait: 16,
+      },
+    },
     chain,
     transport: http(),
   });
 
-export const getClient = (chain: chains.Chain, proxy: AxiosInstance) =>
+export const getClient = (chain: chains.Chain, proxy?: AxiosInstance) =>
   createWalletClient({
     chain,
     transport: transport(chain, proxy),

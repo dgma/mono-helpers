@@ -1,4 +1,7 @@
-export const abi = [
+export const MIN_DEPOSIT_USD = 100;
+export const FUEL_POINTS_CONTRACT = "0x19b5cc75846BF6286d599ec116536a333C4C2c14";
+
+export const FUEL_POINTS_CONTRACT_ABI = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
   { inputs: [], name: "AccessControlBadConfirmation", type: "error" },
   {
