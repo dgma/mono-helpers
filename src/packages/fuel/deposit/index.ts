@@ -1,7 +1,7 @@
 import { zeroAddress, parseEther, PublicClient, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
-import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "./constants";
+import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "../constants";
 import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
 import { decryptMarkedFields } from "src/libs/crypt";

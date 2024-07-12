@@ -1,5 +1,9 @@
 import type { AxiosInstance } from "axios";
 import axiosRetry from "axios-retry";
+import { zeroAddress, PublicClient, formatEther } from "viem";
+import * as chains from "viem/chains";
+import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "../constants";
+import { getPublicClient } from "src/libs/clients";
 import { refreshProxy } from "src/libs/proxify";
 import { getProfiles, saveInFolder } from "src/libs/shared";
 
@@ -13,7 +17,7 @@ export async function accountPoints(axiosInstance: AxiosInstance, address: strin
   return scrollPoints.data?.total_points;
 }
 
-const refreshAndCall = (index: string, address: string) => async (report: any) => {
+const refreshAndCall = (index: string, address: string, client: PublicClient) => async (report: any) => {
   try {
     const axiosInstance = await refreshProxy();
 
@@ -24,8 +28,16 @@ const refreshAndCall = (index: string, address: string) => async (report: any) =
 
     const total_points = await accountPoints(axiosInstance, address);
 
+    const userBalanceInFuel = await client.readContract({
+      address: FUEL_POINTS_CONTRACT,
+      abi: FUEL_POINTS_CONTRACT_ABI,
+      functionName: "getBalance",
+      args: [address as `0x${string}`, zeroAddress],
+    });
+
     report[index] = {
       total_points,
+      deposit: formatEther(userBalanceInFuel),
     };
     return report;
   } catch (error) {
@@ -37,9 +49,10 @@ const refreshAndCall = (index: string, address: string) => async (report: any) =
 
 export async function report(save: boolean) {
   const profiles = getProfiles();
+  const client = getPublicClient(chains.mainnet);
 
   const data = await Object.entries(profiles).reduce(
-    (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address!)),
+    (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address!, client)),
     Promise.resolve({}),
   );
   if (save) {
