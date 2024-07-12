@@ -1,12 +1,9 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
 import { formatEther, parseEther } from "viem";
 import * as chains from "viem/chains";
 import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
 import { getPublicClient } from "src/libs/clients";
 import { withdrawETH, consolidateETH, WithdrawChain, OKX_WITHDRAW_CHAINS } from "src/libs/okx";
-import { getRandomArbitrary } from "src/libs/shared";
-import { Profile } from "src/types/profile";
+import { getRandomArbitrary, saveInFolder, getProfiles } from "src/libs/shared";
 
 const OKXChainToViem = {
   [OKX_WITHDRAW_CHAINS.ETH]: chains.mainnet,
@@ -24,7 +21,7 @@ export const initFunding = async (
   maxBalance: number,
   withdrawChain: WithdrawChain,
 ) => {
-  const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
+  const profiles = getProfiles();
 
   const publicClient = getPublicClient(OKXChainToViem[withdrawChain]);
 
@@ -57,6 +54,16 @@ export const initFunding = async (
 
   if (config.length > 0) {
     await consolidateETH();
-    return withdrawETH(config, 4 * 3600000, 8 * 3600000);
+    const data = await withdrawETH(config, 4 * 3600000, 8 * 3600000);
+    saveInFolder(
+      "./reports/withdrawals.report.json",
+      JSON.stringify(
+        {
+          [new Date().toISOString()]: data,
+        },
+        null,
+        2,
+      ),
+    );
   }
 };

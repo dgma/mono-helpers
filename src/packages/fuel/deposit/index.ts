@@ -1,6 +1,4 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { zeroAddress, parseEther, PublicClient } from "viem";
+import { zeroAddress, parseEther, PublicClient, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "./constants";
@@ -8,7 +6,7 @@ import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
 import { decryptMarkedFields } from "src/libs/crypt";
 import { refreshProxy } from "src/libs/proxify";
-import { getRandomArbitrary } from "src/libs/shared";
+import { getRandomArbitrary, sleep, saveInFolder, getProfiles } from "src/libs/shared";
 import { Profile } from "src/types/profile";
 
 type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
@@ -20,8 +18,8 @@ const getDecodedEVM = (profiles: Profile, masterKey: string) =>
     ...(wallets.evm as EVMWallet),
   }));
 
-const deposit = (wallet: EVMWallet, toDeposit: bigint) => async () => {
-  const axiosInstance = await refreshProxy(getRandomArbitrary(1000, 5000));
+const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
+  const axiosInstance = await refreshProxy();
   const walletClient = await getClient(chain, axiosInstance);
   const { request } = await walletClient.simulateContract({
     address: FUEL_POINTS_CONTRACT,
@@ -31,7 +29,9 @@ const deposit = (wallet: EVMWallet, toDeposit: bigint) => async () => {
     value: toDeposit,
     account: privateKeyToAccount(wallet.pkᵻ),
   });
-  await walletClient.writeContract(request);
+  const txHash = await walletClient.writeContract(request);
+  console.log(`tx send: ${txHash}`);
+  return txHash;
 };
 
 type PrepareFnParams = {
@@ -55,7 +55,8 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
 
   const toDeposit = balance - params.expenses;
 
-  const isEligible = userBalanceInFuel === 0n && toDeposit > 0n && params.ethPrice * toDeposit >= params.minDeposit;
+  const isEligible =
+    userBalanceInFuel === 0n && toDeposit > 0n && params.ethPrice * toDeposit >= params.minDeposit * 10n ** 18n;
 
   return {
     wallet,
@@ -84,22 +85,45 @@ const getExpenses = async (publicClient: PublicClient) => {
   return (depositCost + withdrawCost) * 4n;
 };
 
+const getAccountToDeposit = async (
+  decodedEVMAccounts: ReturnType<typeof getDecodedEVM>,
+  publicClient: PublicClient,
+  minDeposit: number,
+) => {
+  const expenses = await getExpenses(publicClient);
+  const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
+  return Promise.all(
+    decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
+  ).then((accounts) => accounts.find(({ isEligible }) => isEligible));
+};
+
 export async function initDeposits(masterKey: string, minDeposit: number) {
-  const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
+  const profiles = getProfiles();
   const decodedEVMAccounts = getDecodedEVM(profiles, masterKey);
   const publicClient = getPublicClient(chains.mainnet);
 
-  const expenses = await getExpenses(publicClient);
-  const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
+  const report: { [prop: string]: { deposited: string; txHash: `0x${string}` } } = {};
 
-  const accountsToDeposit = await Promise.all(
-    decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
+  let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
+
+  while (accountToDeposit !== undefined) {
+    console.log("accountToDeposit", accountToDeposit);
+    const txHash = await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
+    report[accountToDeposit.wallet.address] = {
+      deposited: formatEther(accountToDeposit.toDeposit),
+      txHash,
+    };
+    await sleep(getRandomArbitrary(3 * 3600000, 6 * 3600000));
+    accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
+  }
+  saveInFolder(
+    "./reports/withdrawals.report.json",
+    JSON.stringify(
+      {
+        [new Date().toISOString()]: report,
+      },
+      null,
+      2,
+    ),
   );
-
-  return accountsToDeposit.reduce((promise, { wallet, isEligible, toDeposit }) => {
-    if (!isEligible) {
-      return promise;
-    }
-    return promise.then(deposit(wallet, toDeposit));
-  }, Promise.resolve());
 }
