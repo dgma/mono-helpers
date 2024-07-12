@@ -53,6 +53,6 @@ export const initFunding = async (
       withdrawChain,
     }));
     await consolidateETH();
-    return withdrawETH(config, 7 * 3600000, 10 * 3600000);
+    return withdrawETH(config, 4 * 3600000, 8 * 3600000);
   }
 };
