@@ -1,4 +1,5 @@
 import { confirm, select } from "@inquirer/prompts";
+import { report as fuelReport } from "src/packages/fuel";
 import { report as l1EthBalance } from "src/packages/mainnet";
 import { report as scrollReport } from "src/packages/scroll";
 
@@ -6,7 +7,7 @@ export const reportExecutors = {
   scrollReport,
   l1EthBalance,
   symbolic: () => {},
-  fuel: () => {},
+  fuel: fuelReport,
 };
 
 (async function main() {
@@ -14,17 +15,16 @@ export const reportExecutors = {
     message: "Select a report type",
     choices: [
       {
-        name: "scroll",
-        value: "scrollReport",
-      },
-      {
         name: "l1 balance",
         value: "l1EthBalance",
       },
       {
+        name: "scroll",
+        value: "scrollReport",
+      },
+      {
         name: "fuel",
-        value: "symbolic",
-        disabled: true,
+        value: "fuel",
       },
       {
         name: "symbolic",
