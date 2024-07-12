@@ -23,7 +23,7 @@ const transport = (chain: chains.Chain, proxy?: AxiosInstance) => {
         `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${getEnv("ALCHEMY_RPC_KEY")}`,
         body,
       );
-      return response.data;
+      return response.data.result;
     },
   });
 };

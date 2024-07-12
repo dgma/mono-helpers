@@ -21,13 +21,14 @@ const getDecodedEVM = (profiles: Profile, masterKey: string) =>
 const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const axiosInstance = await refreshProxy();
   const walletClient = await getClient(chain, axiosInstance);
+  const account = privateKeyToAccount(wallet.pkᵻ);
   const { request } = await walletClient.simulateContract({
     address: FUEL_POINTS_CONTRACT,
     abi: FUEL_POINTS_CONTRACT_ABI,
     functionName: "deposit",
-    args: [zeroAddress, 0n, 0],
+    args: [zeroAddress, toDeposit, 0x0],
     value: toDeposit,
-    account: privateKeyToAccount(wallet.pkᵻ),
+    account,
   });
   const txHash = await walletClient.writeContract(request);
   console.log(`tx send: ${txHash}`);
@@ -81,8 +82,7 @@ const getExpenses = async (publicClient: PublicClient) => {
     args: [zeroAddress, zeroAddress, 0n],
   });
 
-  // x4 possible costs
-  return (depositCost + withdrawCost) * 4n;
+  return (depositCost + withdrawCost) * 4n * (await publicClient.getGasPrice());
 };
 
 const getAccountToDeposit = async (
@@ -91,6 +91,7 @@ const getAccountToDeposit = async (
   minDeposit: number,
 ) => {
   const expenses = await getExpenses(publicClient);
+  console.log("expenses", expenses);
   const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
   return Promise.all(
     decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
@@ -107,7 +108,6 @@ export async function initDeposits(masterKey: string, minDeposit: number) {
   let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
 
   while (accountToDeposit !== undefined) {
-    console.log("accountToDeposit", accountToDeposit);
     const txHash = await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
     report[accountToDeposit.wallet.address] = {
       deposited: formatEther(accountToDeposit.toDeposit),
