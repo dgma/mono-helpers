@@ -80,7 +80,8 @@ const getExpenses = async (publicClient: PublicClient) => {
     args: [zeroAddress, zeroAddress, 0n],
   });
 
-  return depositCost + withdrawCost;
+  // x4 possible costs
+  return (depositCost + withdrawCost) * 4n;
 };
 
 export async function initDeposits(masterKey: string, minDeposit: number) {
