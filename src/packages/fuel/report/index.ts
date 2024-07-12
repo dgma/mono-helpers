@@ -4,11 +4,13 @@ import { refreshProxy } from "src/libs/proxify";
 import { getProfiles, saveInFolder } from "src/libs/shared";
 
 export async function accountPoints(axiosInstance: AxiosInstance, address: string) {
-  const scrollPoints = await axiosInstance.get<
-    { total_points: number; user_rank: number; user_address: `0x${string}` }[]
-  >(`https://app.fuel.network/earn-points/api/points/${address}`);
+  const scrollPoints = await axiosInstance.get<{
+    total_points: number;
+    user_rank: number;
+    user_address: `0x${string}`;
+  }>(`https://app.fuel.network/earn-points/api/points/${address}`);
 
-  return scrollPoints.data[0]?.total_points;
+  return scrollPoints.data?.total_points;
 }
 
 const refreshAndCall = (index: string, address: string) => async (report: any) => {
