@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { formatEther } from "viem";
+import { formatEther, parseEther } from "viem";
 import * as chains from "viem/chains";
 import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
 import { getPublicClient } from "src/libs/clients";
@@ -20,38 +20,42 @@ const OKXChainToViem = {
 
 export const initFunding = async (
   onlyZero: boolean,
-  minAmount: number,
-  maxAmount: number,
+  minBalance: number,
+  maxBalance: number,
   withdrawChain: WithdrawChain,
 ) => {
   const profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
 
   const publicClient = getPublicClient(OKXChainToViem[withdrawChain]);
 
-  const profilesToDeposit = onlyZero
-    ? await Object.values(profiles).reduce(
-        async (promise, profile) => {
-          const profilesToDepositAcc = await promise;
-          const address = profile.wallets.evm.address as `0x${string}`;
-          const balance = await publicClient.getBalance({
-            address,
-          });
-          if (balance === 0n) {
-            profilesToDepositAcc.push(profile);
-          }
-          return profilesToDepositAcc;
-        },
-        Promise.resolve([] as Profile[string][]),
-      )
-    : Object.values(profiles);
+  const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
 
-  if (profilesToDeposit.length > 0) {
-    const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
-    const config = profilesToDeposit.map((profile) => ({
-      address: profile.wallets.evm.address as `0x${string}`,
-      amount: String(parseFloat(formatEther(ethPrice)) / getRandomArbitrary(minAmount, maxAmount)),
-      withdrawChain,
-    }));
+  const rawConfig = await Promise.all(
+    Object.values(profiles).map(async (profile) => {
+      const address = profile.wallets.evm.address as `0x${string}`;
+      const balance = await publicClient.getBalance({
+        address,
+      });
+      if (onlyZero && balance > 0n) {
+        return {
+          address,
+          amount: "0",
+          withdrawChain,
+        };
+      }
+      const usdTargetBalance = String(getRandomArbitrary(minBalance, maxBalance));
+      const expectedBalance = (10n ** 18n * parseEther(usdTargetBalance)) / ethPrice;
+      return {
+        address,
+        amount: formatEther(expectedBalance - balance),
+        withdrawChain,
+      };
+    }),
+  );
+
+  const config = rawConfig.filter((config) => parseFloat(config.amount) > 0);
+
+  if (config.length > 0) {
     await consolidateETH();
     return withdrawETH(config, 4 * 3600000, 8 * 3600000);
   }

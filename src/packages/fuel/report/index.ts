@@ -36,12 +36,13 @@ const refreshAndCall = (index: string, address: string) => async (report: any) =
 export async function report(save: boolean) {
   const profiles = getProfiles();
 
-  const finalReport = await Object.entries(profiles).reduce(
+  const data = await Object.entries(profiles).reduce(
     (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address!)),
     Promise.resolve({}),
   );
-  console.log(JSON.stringify(finalReport, null, 2));
   if (save) {
-    saveInFolder("./reports/fuel.report.json", JSON.stringify(finalReport, null, 2));
+    saveInFolder("./reports/fuel.report.json", JSON.stringify(data, null, 2));
+  } else {
+    console.log(JSON.stringify(data, null, 2));
   }
 }

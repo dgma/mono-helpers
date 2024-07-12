@@ -38,7 +38,11 @@ import { initFunding } from "src/packages/funding";
       },
     ],
   });
-  const minAmount = await input({ message: "enter minimal usd deposit" }).then(validatePositiveNumber);
-  const maxAmount = await input({ message: "enter max usd deposit" }).then(validatePositiveNumber);
+  const minAmount = await input({ message: "enter minimal wallet balance after top up in usd" }).then(
+    validatePositiveNumber,
+  );
+  const maxAmount = await input({ message: "enter maximum wallet balance after top up in usd" }).then(
+    validatePositiveNumber,
+  );
   return initFunding(onlyZero, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[fundingChain]);
 })();

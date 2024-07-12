@@ -1,7 +1,7 @@
-import { okx } from "ccxt";
+import { okx, Transaction } from "ccxt";
 import { OKXNetwork, WithdrawConfig } from "./types";
 import getEnv from "src/env";
-import { getRandomArbitrary, sleep } from "src/libs/shared";
+import { getRandomArbitrary, sleep, saveInFolder } from "src/libs/shared";
 
 const OKX = new okx({
   apiKey: getEnv("OKX_API_KEY"),
@@ -44,10 +44,12 @@ export const consolidateETH = async () => {
 
 export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxDelay: number) => {
   const currencyNetworks = await OKX.fetchCurrencies();
-  config.reduce(
-    async (promise, item) => {
+  const data = await config.reduce(
+    async (promise, item, index) => {
       const txIDs = await promise;
-      await sleep(getRandomArbitrary(minDelay, maxDelay));
+      if (index) {
+        await sleep(getRandomArbitrary(minDelay, maxDelay));
+      }
       const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[item.withdrawChain] as OKXNetwork;
       if (ethNetworkConfig.limits.withdraw.min > parseFloat(item.amount)) {
         throw new Error(`Amount to withdraw ${item.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
@@ -58,13 +60,22 @@ export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxD
       const receipt = await OKX.withdraw("ETH", parseFloat(item.amount), item.address, undefined, {
         amt: parseFloat(item.amount),
         fee: ethNetworkConfig.fee,
-        chainName: ethNetworkConfig.id,
-        network: ethNetworkConfig.network,
+        chain: ethNetworkConfig.info.chain,
       });
-      txIDs.push(receipt.txid);
+      txIDs.push(receipt);
       return txIDs;
     },
-    Promise.resolve([] as (string | undefined)[]),
+    Promise.resolve([] as Transaction[]),
+  );
+  saveInFolder(
+    "./reports/withdrawals.report.json",
+    JSON.stringify(
+      {
+        [new Date().toISOString()]: data,
+      },
+      null,
+      2,
+    ),
   );
 };
 

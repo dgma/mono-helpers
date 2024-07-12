@@ -17,13 +17,11 @@ export const getPrice = async (publicClient: PublicClient, address: `0x${string}
   });
 
   if (targetDecimals > feedDecimals) {
-    return price * BigInt(targetDecimals - feedDecimals);
+    return price * 10n ** BigInt(targetDecimals - feedDecimals);
   }
 
   if (targetDecimals < feedDecimals) {
-    const div = BigInt(feedDecimals - targetDecimals);
-    const drop = price % BigInt(feedDecimals - targetDecimals);
-    return (price - drop) / div;
+    return price / 10n ** BigInt(feedDecimals - targetDecimals);
   }
 
   return price;

@@ -55,7 +55,7 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
 
   const toDeposit = balance - params.expenses;
 
-  const isEligible = userBalanceInFuel === 0n && params.ethPrice * toDeposit >= params.minDeposit;
+  const isEligible = userBalanceInFuel === 0n && toDeposit > 0n && params.ethPrice * toDeposit >= params.minDeposit;
 
   return {
     wallet,
