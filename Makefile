@@ -34,4 +34,6 @@ fuel :; node --import tsx/esm src/cli/fuel.ts
 
 report :; node --import tsx/esm src/cli/report.ts
 
+funding:; node --import tsx/esm src/cli/okxFunding.ts
+
 -include ${FCT_PLUGIN_PATH}/makefile-external
