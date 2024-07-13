@@ -11,6 +11,7 @@ export function getProxyAgent(update = false) {
       maxSockets: 256,
       maxFreeSockets: 256,
       proxy: getURI(),
+      rejectUnauthorized: false,
     });
   }
   return agent;

@@ -7,9 +7,36 @@ import { headers, axiosInstance } from "./sham";
 import { currentTime, markTime } from "src/libs/clock";
 import { sleep } from "src/libs/shared";
 
-async function logIpInfo(proxifyAxios: AxiosInstance) {
-  const res = await proxifyAxios.get("https://ident.me");
-  console.log(`ip ${res.data}`);
+type WhoamiReport = {
+  hostname: string;
+  ip: string[];
+  headers: {
+    Accept: string[];
+    "Accept-Encoding": string[];
+    "Accept-Language": string[];
+    Priority: string[];
+    "Sec-Ch-Ua": string[];
+    "Sec-Ch-Ua-Mobile": string[];
+    "Sec-Ch-Ua-Platform": string[];
+    "Sec-Fetch-Dest": string[];
+    "Sec-Fetch-Mode": string[];
+    "Sec-Fetch-Site": string[];
+    "Sec-Fetch-User": string[];
+    "Upgrade-Insecure-Requests": string[];
+    "User-Agent": string[];
+    "X-Forwarded-For": string[];
+    "X-Forwarded-Host": string[];
+    "X-Real-Ip": string[];
+  };
+  url: string;
+  host: string;
+  method: "GET";
+  remoteAddr: string;
+};
+
+async function logIpInfo(axiosInstance: AxiosInstance) {
+  const res = await axiosInstance.get<WhoamiReport>("https://whoami.lagunovsky.com/api");
+  console.log(`ip ${res.data.headers["X-Real-Ip"]}`);
 }
 
 const httpsAgent = new https.Agent({

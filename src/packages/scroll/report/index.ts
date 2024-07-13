@@ -7,7 +7,7 @@ import { getProfiles, saveInFolder } from "src/libs/shared";
 
 const refreshAndCall = (index: string, address: string) => async (report: any) => {
   try {
-    const axiosInstance = await refreshProxy();
+    const axiosInstance = await refreshProxy(3000);
 
     axiosRetry(axiosInstance, {
       retries: 3,
@@ -24,6 +24,7 @@ const refreshAndCall = (index: string, address: string) => async (report: any) =
     };
     return report;
   } catch (error) {
+    console.log(error);
     console.log((error as { message: any })?.message);
     report[index] = {};
     return report;

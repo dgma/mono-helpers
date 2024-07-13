@@ -82,7 +82,7 @@ const getExpenses = async (publicClient: PublicClient) => {
     args: [zeroAddress, zeroAddress, 0n],
   });
 
-  return (depositCost + withdrawCost) * 4n * (await publicClient.getGasPrice());
+  return (depositCost + withdrawCost) * 5n * (await publicClient.getGasPrice());
 };
 
 const getAccountToDeposit = async (
@@ -91,7 +91,6 @@ const getAccountToDeposit = async (
   minDeposit: number,
 ) => {
   const expenses = await getExpenses(publicClient);
-  console.log("expenses", expenses);
   const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
   return Promise.all(
     decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
@@ -113,7 +112,7 @@ export async function initDeposits(masterKey: string, minDeposit: number) {
       deposited: formatEther(accountToDeposit.toDeposit),
       txHash,
     };
-    await sleep(getRandomArbitrary(3 * 3600000, 6 * 3600000));
+    await sleep(getRandomArbitrary(3 * 3600000, 5 * 3600000));
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
   }
   saveInFolder(
