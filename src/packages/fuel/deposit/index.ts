@@ -112,7 +112,9 @@ export async function initDeposits(masterKey: string, minDeposit: number) {
       deposited: formatEther(accountToDeposit.toDeposit),
       txHash,
     };
-    await sleep(getRandomArbitrary(3 * 3600000, 5 * 3600000));
+    const pauseMs = getRandomArbitrary(3 * 3600000, 5 * 3600000);
+    console.log("sleep for", pauseMs);
+    await sleep(pauseMs);
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
   }
   saveInFolder(

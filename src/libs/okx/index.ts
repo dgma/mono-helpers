@@ -46,8 +46,10 @@ export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxD
   const currencyNetworks = await OKX.fetchCurrencies();
   return await config.reduce(
     async (promise, item) => {
-      const txIDs = await promise;
-      await sleep(getRandomArbitrary(minDelay, maxDelay));
+      const receipts = await promise;
+      const pauseMs = getRandomArbitrary(minDelay, maxDelay);
+      console.log("sleep for", pauseMs);
+      await sleep(pauseMs);
       const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[item.withdrawChain] as OKXNetwork;
       if (ethNetworkConfig.limits.withdraw.min > parseFloat(item.amount)) {
         throw new Error(`Amount to withdraw ${item.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
@@ -55,13 +57,15 @@ export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxD
       if (!ethNetworkConfig.withdraw) {
         throw new Error(`Withdraw ETH for network ${item.withdrawChain} is disabled`);
       }
-      const receipt = await OKX.withdraw("ETH", parseFloat(item.amount), item.address, undefined, {
+      const withdrawalParams = {
         amt: parseFloat(item.amount),
         fee: ethNetworkConfig.fee,
         chain: ethNetworkConfig.info.chain,
-      });
-      txIDs.push(receipt);
-      return txIDs;
+      };
+      const receipt = await OKX.withdraw("ETH", parseFloat(item.amount), item.address, undefined, withdrawalParams);
+      console.log("withdraw with params", JSON.stringify(withdrawalParams));
+      receipts.push(receipt);
+      return receipts;
     },
     Promise.resolve([] as Transaction[]),
   );
