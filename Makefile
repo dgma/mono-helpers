@@ -26,7 +26,12 @@ list :; npx tsx src/cli/list.ts
 
 funding :; npx tsx src/cli/funding.ts
 
-# prompts
-propmpt :; npx tsx src/prompts/$(cmd).ts
+fuel :; npx tsx src/cli/fuel.ts --key $(key)
+
+report :; npx tsx src/cli/report.ts
+
+profiles :; npx tsx src/cli/profiles.ts --key $(key)
+
+recover :; npx tsx src/cli/profiles.ts --key $(key)
 
 -include ${FCT_PLUGIN_PATH}/makefile-external

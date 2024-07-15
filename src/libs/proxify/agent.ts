@@ -1,5 +1,5 @@
 import { HttpsProxyAgent } from "hpagent";
-import proxyConfig from "./config";
+import conf from "src/conf";
 
 let agent: HttpsProxyAgent;
 
@@ -23,6 +23,6 @@ export function refreshProxyAgent() {
 }
 
 export function getURI() {
-  const { username, password, host, port } = proxyConfig();
-  return `http://${username}:${password}@${host}:${port}`;
+  const { user, pass, host, port } = conf.proxy;
+  return `http://${user}:${pass}@${host}:${port}`;
 }

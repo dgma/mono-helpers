@@ -1,5 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { SupportedChains } from "src/types/okx";
+import { Networks } from "src/types/profile";
 
 export type Conf = {
   proxy: {
@@ -19,11 +21,22 @@ export type Conf = {
     secret: string;
     password: string;
   };
-  packages: {
+  cli: {
     funding: {
-      chain: "eth" | "arb" | "op" | "zks" | "linea" | "matic" | "base";
+      chain: SupportedChains;
       filters: ("noFuel" | "onlyZero")[];
       depositRange: [number, number];
+    };
+    fuel: {
+      minDeposit: number;
+    };
+    report: {
+      type: ("l1Balance" | "scroll" | "fuel")[];
+      save: boolean;
+    };
+    profiles: {
+      amount: number;
+      chains: Networks[];
     };
   };
 };

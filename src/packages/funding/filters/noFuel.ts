@@ -1,5 +1,5 @@
 import { zeroAddress, PublicClient } from "viem";
-import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/packages/fuel/constants";
+import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fuel";
 
 export const noFuel = async (client: PublicClient, address: `0x${string}`) => {
   const userBalanceInFuel = await client.readContract({

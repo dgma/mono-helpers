@@ -2,10 +2,8 @@ import * as chains from "viem/chains";
 
 export const SUPPORTED_FEEDS = ["ETHUSD"] as const;
 
-export type SupportedFeeds = (typeof SUPPORTED_FEEDS)[number];
-
 type ChainLinkAddressesMap = {
-  [key in SupportedFeeds]: {
+  [key in (typeof SUPPORTED_FEEDS)[number]]: {
     [chainId: number]: `0x${string}`;
   };
 };

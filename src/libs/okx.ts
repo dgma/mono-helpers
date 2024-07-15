@@ -1,12 +1,12 @@
 import { okx, Transaction } from "ccxt";
-import { OKXNetwork, WithdrawConfig } from "./types";
-import getEnv from "src/env";
+import conf from "src/conf";
 import { getRandomArbitrary, sleep } from "src/libs/shared";
+import { OKXNetwork, WithdrawConfig } from "src/types/okx";
 
 const OKX = new okx({
-  apiKey: getEnv("OKX_API_KEY"),
-  secret: getEnv("OKX_SECRET_KEY"),
-  password: getEnv("OKX_PASSWORD"),
+  apiKey: conf.okx.key,
+  secret: conf.okx.secret,
+  password: conf.okx.password,
   options: { defaultType: "spot" },
 });
 
@@ -70,6 +70,3 @@ export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxD
     Promise.resolve([] as Transaction[]),
   );
 };
-
-export type { SupportedChains, WithdrawChain } from "./types";
-export { OKX_WITHDRAW_CHAINS } from "./constants";

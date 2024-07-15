@@ -2,7 +2,7 @@ import type { AxiosInstance } from "axios";
 import axiosRetry from "axios-retry";
 import { zeroAddress, PublicClient, formatEther } from "viem";
 import * as chains from "viem/chains";
-import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "../constants";
+import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fuel";
 import { getPublicClient } from "src/libs/clients";
 import { refreshProxy } from "src/libs/proxify";
 import { getProfiles, saveInFolder } from "src/libs/shared";

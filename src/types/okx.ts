@@ -1,4 +1,4 @@
-import { OKX_WITHDRAW_CHAINS } from "./constants";
+import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 
 export type SupportedChains = keyof typeof OKX_WITHDRAW_CHAINS;
 
