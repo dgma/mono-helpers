@@ -4,5 +4,5 @@ export const lteBalance = (minBalance: number) => async (client: PublicClient, a
   const balance = await client.getBalance({
     address,
   });
-  return balance > BigInt(minBalance);
+  return balance <= BigInt(minBalance);
 };
