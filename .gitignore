@@ -29,3 +29,4 @@ yarn-error.log*
 .mnemonics.json
 reports/
 !src/**/*
+.app.config.json

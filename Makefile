@@ -24,6 +24,8 @@ migrate :; npx tsx src/migrations/$(script).ts
 # cli
 list :; npx tsx src/cli/list.ts
 
+funding :; npx tsx src/cli/funding.ts
+
 # prompts
 propmpt :; npx tsx src/prompts/$(cmd).ts
 

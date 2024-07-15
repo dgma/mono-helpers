@@ -18,7 +18,9 @@
   },
   "packages": {
     "funding": {
-      "chain": "eth"
+      "chain": "eth",
+      "filters": ["noFuel"],
+      "depositRange": [100, 200]
     }
   }
 }
