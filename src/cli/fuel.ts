@@ -4,4 +4,8 @@ import { initDeposits } from "src/core/fuel";
 
 const key = await password({ message: "Enter master key" });
 
-await initDeposits(key, conf.cli.fuel.minDeposit);
+(async function main() {
+  console.log("initiated");
+  await initDeposits(key, conf.cli.fuel.minDeposit);
+  console.log("finished");
+})();

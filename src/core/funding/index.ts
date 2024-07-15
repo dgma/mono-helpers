@@ -60,6 +60,7 @@ export const initFunding = async (
   const config = rawConfig.filter((config) => parseFloat(config.amount) > 0);
 
   if (config.length > 0) {
+    console.log("start funding process..");
     await consolidateETH();
     const data = await withdrawETH(config, 4 * 3600000, 8 * 3600000);
     saveInFolder(

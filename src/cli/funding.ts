@@ -15,4 +15,8 @@ const filters = conf.cli.funding.filters.map((filter) => fFiltersMap[filter]);
 const [minAmount, maxAmount] = conf.cli.funding.depositRange;
 const chain = conf.cli.funding.chain;
 
-await initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[chain]);
+(async function main() {
+  console.log("initiated");
+  await initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[chain]);
+  console.log("finished");
+})();
