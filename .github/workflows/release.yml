@@ -7,7 +7,15 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - name: Run unit tests
+        run: make test
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
