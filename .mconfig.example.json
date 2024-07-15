@@ -1,0 +1,24 @@
+{
+  "proxy": {
+    "user": "xxxxxx",
+    "pass": "xxxxxx",
+    "host": "dproxy.site",
+    "port": "11111",
+    "reboot-link": "https://changeip.mobileproxy.space/?proxy_key="
+  },
+  "rpc": {
+    "alchemy": {
+      "key": "xxxxxxx"
+    }
+  },
+  "okx": {
+    "key": "xxxxxxx",
+    "secret": "xxxxxx",
+    "password": "xxxxxxx"
+  },
+  "packages": {
+    "funding": {
+      "chain": "eth"
+    }
+  }
+}
