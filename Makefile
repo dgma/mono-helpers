@@ -19,21 +19,12 @@ test :; npx jest --passWithNoTests
 pre-commit: typecheck lint-stg
 pre-push : lint typecheck test
 
-dev :; npx tsx src/cli/$(cmd).ts
+migrate :; npx tsx src/migrations/$(script).ts
 
-migrate :; npx tsx src/migrations/$(cmd).ts
+# cli
+list :; npx tsx src/cli/list.ts
 
-# commands
-list :; node --import tsx/esm src/cli/list.ts
-
-profile :; node --import tsx/esm src/cli/profiles.ts
-
-recover :; node --import tsx/esm src/cli/recover.ts
-
-fuel :; node --import tsx/esm src/cli/fuel.ts
-
-report :; node --import tsx/esm src/cli/report.ts
-
-funding:; node --import tsx/esm src/cli/okxFunding.ts
+# prompts
+propmpt :; npx tsx src/prompts/$(cmd).ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external

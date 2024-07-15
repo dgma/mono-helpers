@@ -7,13 +7,13 @@ import { withdrawETH, consolidateETH, WithdrawChain, OKX_WITHDRAW_CHAINS } from 
 import { getRandomArbitrary, saveInFolder, getProfiles } from "src/libs/shared";
 
 const OKXChainToViem = {
-  [OKX_WITHDRAW_CHAINS.ETH]: chains.mainnet,
-  [OKX_WITHDRAW_CHAINS.ARB]: chains.arbitrum,
-  [OKX_WITHDRAW_CHAINS.OP]: chains.optimism,
-  [OKX_WITHDRAW_CHAINS.ZKS]: chains.zkSync,
-  [OKX_WITHDRAW_CHAINS.LINEA]: chains.linea,
-  [OKX_WITHDRAW_CHAINS.MATIC]: chains.polygon,
-  [OKX_WITHDRAW_CHAINS.BASE]: chains.base,
+  [OKX_WITHDRAW_CHAINS.eth]: chains.mainnet,
+  [OKX_WITHDRAW_CHAINS.arb]: chains.arbitrum,
+  [OKX_WITHDRAW_CHAINS.op]: chains.optimism,
+  [OKX_WITHDRAW_CHAINS.zks]: chains.zkSync,
+  [OKX_WITHDRAW_CHAINS.linea]: chains.linea,
+  [OKX_WITHDRAW_CHAINS.matic]: chains.polygon,
+  [OKX_WITHDRAW_CHAINS.base]: chains.base,
 };
 
 export const initFunding = async (

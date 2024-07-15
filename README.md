@@ -1,9 +1,12 @@
 # Prompt based Web3 Helpers
 
 - [Profile generator](docs/profile.md) for different chains.
-- Mainnet eth balance.
-- [Scroll marks](https://scroll.io/sessions) & [NURI](https://www.nuri.exchange/swap) LP report
-- [Fuel Points](https://app.fuel.network/earn-points) farming with automatic ETH deposits
+- Reports:
+  - Ethereum wallet balance on L1
+  - [Scroll marks](https://scroll.io/sessions) & [NURI](https://www.nuri.exchange/swap) LP report
+  - [Fuel Points](https://app.fuel.network/earn-points) farming with automatic ETH deposits
+- OKX conditional withdrawal
+- Fuel deposits
 
 All available commands: `make list`
 

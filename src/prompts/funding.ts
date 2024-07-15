@@ -39,31 +39,31 @@ const selectFilters = async () => {
     choices: [
       {
         name: "Mainnet",
-        value: "ETH",
+        value: "eth",
       },
       {
         name: "Arbitrum One",
-        value: "ARB",
+        value: "arb",
       },
       {
         name: "Optimism",
-        value: "OP",
+        value: "op",
       },
       {
         name: "Base",
-        value: "BASE",
+        value: "base",
       },
       {
         name: "zkSync Era",
-        value: "ZKS",
+        value: "zks",
       },
       {
         name: "Linea",
-        value: "LINEA",
+        value: "linea",
       },
       {
         name: "Matic",
-        value: "MATIC",
+        value: "matic",
       },
     ],
   });

@@ -25,6 +25,7 @@
   },
   "type": "module",
   "scripts": {
+    "cli": "npx tsx src/cli/index.ts",
     "prepare": "husky install"
   },
   "dependencies": {
