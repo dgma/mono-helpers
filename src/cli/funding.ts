@@ -1,7 +1,7 @@
 import conf from "src/conf";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
-import { initFunding } from "src/packages/funding";
-import { noFuel, onlyZero } from "src/packages/funding/filters";
+import { initFunding } from "src/core/funding";
+import { noFuel, onlyZero } from "src/core/funding/filters";
 import { FundingFilter } from "src/types/funding";
 
 const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter } = { noFuel, onlyZero };

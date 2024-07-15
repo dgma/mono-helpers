@@ -1,7 +1,7 @@
 import conf from "src/conf";
-import { report as fuelReport } from "src/packages/fuel";
-import { report as l1EthBalance } from "src/packages/mainnet";
-import { report as scrollReport } from "src/packages/scroll";
+import { report as fuelReport } from "src/core/fuel";
+import { report as l1EthBalance } from "src/core/mainnet";
+import { report as scrollReport } from "src/core/scroll";
 
 const reportExecutors = {
   l1Balance: l1EthBalance,

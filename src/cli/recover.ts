@@ -1,6 +1,6 @@
 import { Command, Option } from "@commander-js/extra-typings";
 import conf from "src/conf";
-import { recoverProfiles } from "src/packages/profiles";
+import { recoverProfiles } from "src/core/profiles";
 
 new Command()
   .addOption(new Option("-k, --key <masterKey>").makeOptionMandatory())
