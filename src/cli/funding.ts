@@ -1,25 +1,14 @@
-import { Command, Option } from "@commander-js/extra-typings";
-import { OKX_WITHDRAW_CHAINS } from "src/libs/okx";
-import { initFunding } from "src/packages/funding";
-import { noFuel, onlyZero } from "src/packages/funding/filters";
-import { FundingFilter } from "src/packages/funding/types";
+import conf from "src/conf";
+import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
+import { initFunding } from "src/core/funding";
+import { noFuel, onlyZero } from "src/core/funding/filters";
+import { FundingFilter } from "src/types/funding";
 
-const opts = new Command()
-  .addOption(
-    new Option("-c, --chain <chain>")
-      .choices(["eth", "arb", "op", "base", "zks", "linea", "matic"] as const)
-      .makeOptionMandatory(),
-  )
-  .addOption(
-    new Option("-f, --filters <filters>").choices(["noFuel", "onlyZero", "void"] as const).makeOptionMandatory(),
-  )
-  .addOption(new Option("-r, --range <range>").makeOptionMandatory())
-  .parse()
-  .opts();
+const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter } = { noFuel, onlyZero };
 
-const fFiltersMap: { [prop: string]: FundingFilter } = { noFuel, onlyZero, void: async () => true };
+const filters = conf.cli.funding.filters.map((filter) => fFiltersMap[filter]);
 
-const filters = opts.filters ? opts.filters.split(",").map((filter) => fFiltersMap[filter]) : [];
-const [minAmount, maxAmount] = opts.range.split("-").map(Number);
+const [minAmount, maxAmount] = conf.cli.funding.depositRange;
+const chain = conf.cli.funding.chain;
 
-initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[opts.chain as keyof typeof OKX_WITHDRAW_CHAINS]);
+initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[chain]);

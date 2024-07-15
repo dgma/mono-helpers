@@ -1,10 +1,13 @@
 import { formatEther, parseEther } from "viem";
 import * as chains from "viem/chains";
-import { FundingFilter } from "./types";
-import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
+import { chainLinkAddresses } from "src/constants/chainlink";
+import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
+import { getPrice } from "src/libs/chainlink";
 import { getPublicClient } from "src/libs/clients";
-import { withdrawETH, consolidateETH, WithdrawChain, OKX_WITHDRAW_CHAINS } from "src/libs/okx";
+import { withdrawETH, consolidateETH } from "src/libs/okx";
 import { getRandomArbitrary, saveInFolder, getProfiles } from "src/libs/shared";
+import { FundingFilter } from "src/types/funding";
+import { WithdrawChain } from "src/types/okx";
 
 const OKXChainToViem = {
   [OKX_WITHDRAW_CHAINS.eth]: chains.mainnet,
@@ -55,8 +58,6 @@ export const initFunding = async (
   );
 
   const config = rawConfig.filter((config) => parseFloat(config.amount) > 0);
-
-  console.log(config);
 
   if (config.length > 0) {
     await consolidateETH();

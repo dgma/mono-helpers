@@ -16,9 +16,22 @@
     "secret": "xxxxxx",
     "password": "xxxxxxx"
   },
-  "packages": {
+  "cli": {
     "funding": {
-      "chain": "eth"
+      "chain": "eth",
+      "filters": ["noFuel"],
+      "depositRange": [100, 200]
+    },
+    "fuel": {
+      "minDeposit": 100
+    },
+    "report": {
+      "type": ["l1Balance", "scroll", "fuel"],
+      "save": true
+    },
+    "profiles": {
+      "amount": 60,
+      "chains": ["btc", "evm", "sol", "tia", "atom"]
     }
   }
 }

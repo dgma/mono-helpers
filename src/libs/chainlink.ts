@@ -1,7 +1,5 @@
 import { PublicClient } from "viem";
-import { CHAINLINK_CONTRACT_ABI } from "./constants";
-
-export { chainLinkAddresses } from "./constants";
+import { CHAINLINK_CONTRACT_ABI } from "src/constants/chainlink";
 
 export const getPrice = async (publicClient: PublicClient, address: `0x${string}`, targetDecimals: number) => {
   const [, price, , ,] = await publicClient.readContract({
