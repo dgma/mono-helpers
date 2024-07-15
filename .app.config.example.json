@@ -19,19 +19,35 @@
   "cli": {
     "funding": {
       "chain": "eth",
-      "filters": ["noFuel"],
-      "depositRange": [100, 200]
+      "filters": [
+        "noFuel"
+      ],
+      "depositRange": [
+        100,
+        200
+      ],
+      "lteBalance": 30
     },
     "fuel": {
       "minDeposit": 100
     },
     "report": {
-      "type": ["l1Balance", "scroll", "fuel"],
+      "type": [
+        "l1Balance",
+        "scroll",
+        "fuel"
+      ],
       "save": true
     },
     "profiles": {
       "amount": 60,
-      "chains": ["btc", "evm", "sol", "tia", "atom"]
+      "chains": [
+        "btc",
+        "evm",
+        "sol",
+        "tia",
+        "atom"
+      ]
     }
   }
 }

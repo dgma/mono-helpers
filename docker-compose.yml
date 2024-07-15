@@ -1,12 +1,12 @@
 version: "3.7"
 
 services:
-  automation-node:
-    hostname: automation-node
-    image: automation-node
+  mono: &mono_base
+    image: mono
     restart: always
     build:
       context: .
+    command: ["sleep", "infinity"]
     logging:
       driver: "json-file"
       options:

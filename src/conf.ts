@@ -24,8 +24,9 @@ export type Conf = {
   cli: {
     funding: {
       chain: SupportedChains;
-      filters: ("noFuel" | "onlyZero")[];
+      filters: ("noFuel" | "onlyZero" | "lteBalance")[];
       depositRange: [number, number];
+      lteBalance: number;
     };
     fuel: {
       minDeposit: number;

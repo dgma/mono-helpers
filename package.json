@@ -25,14 +25,13 @@
   },
   "type": "module",
   "scripts": {
-    "cli": "npx tsx src/cli/index.ts",
     "prepare": "husky install"
   },
   "dependencies": {
     "@commander-js/extra-typings": "^12.1.0",
     "@cosmjs/crypto": "^0.32.3",
     "@cosmjs/encoding": "^0.32.3",
-    "@inquirer/prompts": "^5.0.7",
+    "@inquirer/prompts": "^5.1.2",
     "@scure/bip32": "^1.4.0",
     "axios": "^1.7.2",
     "axios-retry": "^4.4.1",

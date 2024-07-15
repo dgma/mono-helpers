@@ -1,8 +1,7 @@
-import { Command, Option } from "@commander-js/extra-typings";
+import { password } from "@inquirer/prompts";
 import conf from "src/conf";
 import { recoverProfiles } from "src/core/profiles";
 
-new Command()
-  .addOption(new Option("-k, --key <masterKey>").makeOptionMandatory())
-  .action(({ key }) => recoverProfiles(conf.cli.profiles.chains, key))
-  .parseAsync();
+const key = await password({ message: "Enter master key" });
+
+await recoverProfiles(conf.cli.profiles.chains, key);

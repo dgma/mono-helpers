@@ -13,3 +13,4 @@ eslint*
 .editorconfig
 .prettierrc
 LICENSE
+.app.config.example.json

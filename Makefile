@@ -21,17 +21,21 @@ pre-push : lint typecheck test
 
 migrate :; npx tsx src/migrations/$(script).ts
 
+docker-build :; docker build --tag 'mono' .
+docker-run :; docker run -d --name $(name) mono
+docker-exec :; docker exec -it $(id) /bin/sh
+
 # cli
 list :; npx tsx src/cli/list.ts
 
 funding :; npx tsx src/cli/funding.ts
 
-fuel :; npx tsx src/cli/fuel.ts --key $(key)
+fuel :; npx tsx src/cli/fuel.ts
 
 report :; npx tsx src/cli/report.ts
 
-profiles :; npx tsx src/cli/profiles.ts --key $(key)
+profiles :; npx tsx src/cli/profiles.ts
 
-recover :; npx tsx src/cli/profiles.ts --key $(key)
+recover :; npx tsx src/cli/profiles.ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external

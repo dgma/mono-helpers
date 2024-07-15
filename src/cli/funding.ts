@@ -1,14 +1,18 @@
 import conf from "src/conf";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 import { initFunding } from "src/core/funding";
-import { noFuel, onlyZero } from "src/core/funding/filters";
+import { noFuel, onlyZero, lteBalance } from "src/core/funding/filters";
 import { FundingFilter } from "src/types/funding";
 
-const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter } = { noFuel, onlyZero };
+const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter; lteBalance: FundingFilter } = {
+  noFuel,
+  onlyZero,
+  lteBalance: lteBalance(conf.cli.funding.lteBalance),
+};
 
 const filters = conf.cli.funding.filters.map((filter) => fFiltersMap[filter]);
 
 const [minAmount, maxAmount] = conf.cli.funding.depositRange;
 const chain = conf.cli.funding.chain;
 
-initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[chain]);
+await initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[chain]);

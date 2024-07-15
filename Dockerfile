@@ -11,6 +11,7 @@ RUN npm ci
 
 # Rebuild the source code only when needed
 FROM node:20-alpine
+RUN apk update && apk add --no-cache make
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
@@ -22,4 +23,4 @@ RUN adduser --system --uid 1001 automation-nodejs
 
 USER automation-nodejs
 
-CMD ["make", "list"]
+CMD ["sleep", "infinity"]

@@ -1,8 +1,7 @@
-import { Command, Option } from "@commander-js/extra-typings";
+import { password } from "@inquirer/prompts";
 import conf from "src/conf";
 import { initDeposits } from "src/core/fuel";
 
-new Command()
-  .addOption(new Option("-k, --key <masterKey>").makeOptionMandatory())
-  .action(({ key }) => initDeposits(key, conf.cli.fuel.minDeposit))
-  .parseAsync();
+const key = await password({ message: "Enter master key" });
+
+await initDeposits(key, conf.cli.fuel.minDeposit);

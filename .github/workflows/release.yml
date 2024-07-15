@@ -1,0 +1,29 @@
+name: Reusable Workflow for Continues Deployment & Delivery
+
+on:
+  push:
+    branches: ["main"]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: docker compose build;
+  deploy_sources:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: easingthemes/ssh-deploy@v5.0.3
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.serverSshPrivateKey }}
+          SOURCE: "."
+          REMOTE_HOST: ${{ secrets.remoteHost }}
+          REMOTE_USER: ${{ secrets.remoteUser }}
+          EXCLUDE: "/docs/, /node_modules/"
+          TARGET: /root/mono/
