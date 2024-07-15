@@ -39,6 +39,7 @@ export const initFunding = async (
       });
       for (let filter of filters) {
         const filterPassed = await filter(publicClient, address);
+        console.log(`${filter.name} is ${filterPassed}`);
         if (!filterPassed) {
           return {
             address,

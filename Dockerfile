@@ -23,4 +23,4 @@ RUN adduser --system --uid 1001 automation-nodejs
 
 USER automation-nodejs
 
-CMD ["sleep", "infinity"]
+CMD ["make", "list"]

@@ -18,10 +18,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# local env files
-.env*.local
-.env
-
 # typescript
 *.tsbuildinfo
 .profiles.json
@@ -30,3 +26,4 @@ yarn-error.log*
 reports/
 !src/**/*
 .app.config.json
+master_key

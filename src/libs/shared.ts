@@ -1,5 +1,6 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { password } from "@inquirer/prompts";
 import { Profile } from "src/types/profile";
 
 export const sleep = (time: number = 1000) =>
@@ -26,4 +27,10 @@ export const saveInFolder = (savePath: string, data: string) => {
     mkdirSync(clearPath);
   }
   writeFileSync(savePath, data);
+};
+
+export const getMasterKey = async () => {
+  return existsSync("/run/secrets/master_key")
+    ? readFileSync(resolve("/run/secrets/master_key"), "utf-8")
+    : await password({ message: "Enter master key" });
 };

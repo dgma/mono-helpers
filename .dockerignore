@@ -14,3 +14,4 @@ eslint*
 .prettierrc
 LICENSE
 .app.config.example.json
+master_key

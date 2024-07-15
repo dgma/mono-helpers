@@ -1,14 +1,30 @@
 version: "3.7"
 
 services:
-  mono: &mono_base
+  funding:
     image: mono
     restart: always
     build:
       context: .
-    command: ["sleep", "infinity"]
+    command: ["make", "funding"]
     logging:
       driver: "json-file"
       options:
         max-file: "5"
         max-size: "100m"
+  fuel:
+    image: mono
+    restart: always
+    build:
+      context: .
+    command: ["make", "fuel"]
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "100m"
+    secrets:
+      - master_key
+secrets:
+  master_key:
+    file: ./master_key

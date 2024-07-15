@@ -21,10 +21,6 @@ pre-push : lint typecheck test
 
 migrate :; npx tsx src/migrations/$(script).ts
 
-docker-build :; docker build --tag 'mono' .
-docker-run :; docker run -d --name $(name) mono
-docker-exec :; docker exec -it $(id) /bin/sh
-
 # cli
 list :; npx tsx src/cli/list.ts
 
