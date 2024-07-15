@@ -1,5 +1,6 @@
 import { formatEther, parseEther } from "viem";
 import * as chains from "viem/chains";
+import { FundingFilter } from "./types";
 import { getPrice, chainLinkAddresses } from "src/libs/chainlink";
 import { getPublicClient } from "src/libs/clients";
 import { withdrawETH, consolidateETH, WithdrawChain, OKX_WITHDRAW_CHAINS } from "src/libs/okx";
@@ -16,7 +17,7 @@ const OKXChainToViem = {
 };
 
 export const initFunding = async (
-  onlyZero: boolean,
+  filters: FundingFilter[],
   minBalance: number,
   maxBalance: number,
   withdrawChain: WithdrawChain,
@@ -33,12 +34,15 @@ export const initFunding = async (
       const balance = await publicClient.getBalance({
         address,
       });
-      if (onlyZero && balance > 0n) {
-        return {
-          address,
-          amount: "0",
-          withdrawChain,
-        };
+      for (let filter of filters) {
+        const filterPassed = await filter(publicClient, address);
+        if (!filterPassed) {
+          return {
+            address,
+            amount: "0",
+            withdrawChain,
+          };
+        }
       }
       const usdTargetBalance = String(getRandomArbitrary(minBalance, maxBalance));
       const expectedBalance = (10n ** 18n * parseEther(usdTargetBalance)) / ethPrice;
@@ -51,6 +55,8 @@ export const initFunding = async (
   );
 
   const config = rawConfig.filter((config) => parseFloat(config.amount) > 0);
+
+  console.log(config);
 
   if (config.length > 0) {
     await consolidateETH();
