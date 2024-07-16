@@ -1,20 +1,20 @@
 {
   "proxy": {
-    "user": "xxxxxx",
-    "pass": "xxxxxx",
-    "host": "dproxy.site",
-    "port": "11111",
-    "reboot-link": "https://changeip.mobileproxy.space/?proxy_key="
+    "userᵻ": "xxxxxx",
+    "passᵻ": "xxxxxx",
+    "hostᵻ": "dproxy.site",
+    "portᵻ": "11111",
+    "reboot-linkᵻ": "https://changeip.mobileproxy.space/?proxy_key="
   },
   "rpc": {
     "alchemy": {
-      "key": "xxxxxxx"
+      "keyᵻ": "xxxxxxx"
     }
   },
   "okx": {
-    "key": "xxxxxxx",
-    "secret": "xxxxxx",
-    "password": "xxxxxxx"
+    "keyᵻ": "xxxxxxx",
+    "secretᵻ": "xxxxxx",
+    "passwordᵻ": "xxxxxxx"
   },
   "cli": {
     "funding": {

@@ -27,4 +27,4 @@ services:
       - master_key
 secrets:
   master_key:
-    file: ./master_key
+    environment: MASTER_KEY

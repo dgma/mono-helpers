@@ -35,6 +35,7 @@ export const getPublicClient = (chain: chains.Chain) =>
         wait: 16,
       },
     },
+    cacheTime: 10_000,
     chain,
     transport: http(),
   });

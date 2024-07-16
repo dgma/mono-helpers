@@ -21,6 +21,8 @@ pre-push : lint typecheck test
 
 migrate :; npx tsx src/migrations/$(script).ts
 
+up :; read -s -r -e -p "MASTER_KEY: " MASTER_KEY && MASTER_KEY=${MASTER_KEY} docker compose up -d && unset MASTER_KEY && docker compose logs -f
+
 # cli
 list :; npx tsx src/cli/list.ts
 
@@ -33,5 +35,7 @@ report :; npx tsx src/cli/report.ts
 profiles :; npx tsx src/cli/profiles.ts
 
 recover :; npx tsx src/cli/profiles.ts
+
+encryptJson :; npx tsx src/cli/encryptJson.ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external
