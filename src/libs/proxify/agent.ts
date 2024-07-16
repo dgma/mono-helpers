@@ -1,16 +1,16 @@
 import { HttpsProxyAgent } from "hpagent";
-import conf from "src/conf";
+import readConf from "src/conf";
 
 let agent: HttpsProxyAgent;
 
-export function getProxyAgent(update = false) {
+export async function getProxyAgent(update = false) {
   if (agent === undefined || update) {
     agent = new HttpsProxyAgent({
       keepAlive: true,
       keepAliveMsecs: 10000,
       maxSockets: 256,
       maxFreeSockets: 256,
-      proxy: getURI(),
+      proxy: await getURI(),
       rejectUnauthorized: false,
     });
   }
@@ -22,7 +22,7 @@ export function refreshProxyAgent() {
   return getProxyAgent(true);
 }
 
-export function getURI() {
-  const { user, pass, host, port } = conf.proxy;
-  return `http://${user}:${pass}@${host}:${port}`;
+export async function getURI() {
+  const { proxy } = await readConf();
+  return `http://${proxy.userᵻ}:${proxy.passᵻ}@${proxy.hostᵻ}:${proxy.portᵻ}`;
 }

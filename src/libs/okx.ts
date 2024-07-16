@@ -1,30 +1,40 @@
-import { okx, Transaction } from "ccxt";
-import conf from "src/conf";
+import { okx } from "ccxt";
+import readConf from "src/conf";
 import { getRandomArbitrary, sleep } from "src/libs/shared";
 import { OKXNetwork, WithdrawConfig } from "src/types/okx";
 
-const OKX = new okx({
-  apiKey: conf.okx.key,
-  secret: conf.okx.secret,
-  password: conf.okx.password,
-  options: { defaultType: "spot" },
-});
+let OKX: okx;
+
+const getOKX = async () => {
+  if (!OKX) {
+    const conf = await readConf();
+    OKX = new okx({
+      apiKey: conf.okx.keyᵻ,
+      secret: conf.okx.secretᵻ,
+      password: conf.okx.passwordᵻ,
+      options: { defaultType: "spot" },
+    });
+  }
+  return OKX;
+};
 
 const subaccountETHBalance = async (subAcct: string) => {
   const {
     data: [data],
-  } = await OKX.privateGetAssetSubaccountBalances({ subAcct, ccy: "ETH" });
+  } = await (await getOKX()).privateGetAssetSubaccountBalances({ subAcct, ccy: "ETH" });
   return {
     available: parseFloat(data.availBal),
     frozen: parseFloat(data.frozenBal),
   };
 };
 
-const getSubAccounts = () =>
-  OKX.privateGetUsersSubaccountList().then(({ data }) => data.map((item: { subAcct: any }) => item.subAcct));
+const getSubAccounts = async () =>
+  (await getOKX())
+    .privateGetUsersSubaccountList()
+    .then(({ data }) => data.map((item: { subAcct: any }) => item.subAcct));
 
 const moveETHfromSibAccountToMain = async (subAcct: string, amount: string) =>
-  OKX.privatePostAssetTransfer({
+  (await getOKX()).privatePostAssetTransfer({
     ccy: "ETH",
     amt: amount,
     from: 6, // Funding account
@@ -43,30 +53,22 @@ export const consolidateETH = async () => {
 };
 
 export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxDelay: number) => {
-  const currencyNetworks = await OKX.fetchCurrencies();
-  return await config.reduce(
-    async (promise, item) => {
-      const receipts = await promise;
-      const pauseMs = getRandomArbitrary(minDelay, maxDelay);
-      console.log("sleep for", pauseMs);
-      await sleep(pauseMs);
-      const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[item.withdrawChain] as OKXNetwork;
-      if (ethNetworkConfig.limits.withdraw.min > parseFloat(item.amount)) {
-        throw new Error(`Amount to withdraw ${item.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
-      }
-      if (!ethNetworkConfig.withdraw) {
-        throw new Error(`Withdraw ETH for network ${item.withdrawChain} is disabled`);
-      }
-      const withdrawalParams = {
-        amt: parseFloat(item.amount),
-        fee: ethNetworkConfig.fee,
-        chain: ethNetworkConfig.info.chain,
-      };
-      const receipt = await OKX.withdraw("ETH", parseFloat(item.amount), item.address, undefined, withdrawalParams);
-      console.log("withdraw with params", JSON.stringify(withdrawalParams));
-      receipts.push(receipt);
-      return receipts;
-    },
-    Promise.resolve([] as Transaction[]),
-  );
+  const currencyNetworks = await (await getOKX()).fetchCurrencies();
+  const pauseMs = getRandomArbitrary(minDelay, maxDelay);
+  console.log("sleep for", pauseMs);
+  await sleep(pauseMs);
+  const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[config.withdrawChain] as OKXNetwork;
+  if (ethNetworkConfig.limits.withdraw.min > parseFloat(config.amount)) {
+    throw new Error(`Amount to withdraw ${config.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
+  }
+  if (!ethNetworkConfig.withdraw) {
+    throw new Error(`Withdraw ETH for network ${config.withdrawChain} is disabled`);
+  }
+  const withdrawalParams = {
+    amt: parseFloat(config.amount),
+    fee: ethNetworkConfig.fee,
+    chain: ethNetworkConfig.info.chain,
+  };
+  console.log("withdraw with params", JSON.stringify(withdrawalParams));
+  return (await getOKX()).withdraw("ETH", parseFloat(config.amount), config.address, undefined, withdrawalParams);
 };

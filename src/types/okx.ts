@@ -45,4 +45,4 @@ export type WithdrawConfig = {
   address: `0x${string}`;
   amount: string;
   withdrawChain: WithdrawChain;
-}[];
+};

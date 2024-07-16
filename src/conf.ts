@@ -6,6 +6,7 @@ import { SupportedChains } from "src/types/okx";
 import { Networks } from "src/types/profile";
 
 export type Conf = {
+  masterKey: string;
   proxy: {
     userᵻ: string;
     passᵻ: string;
@@ -51,6 +52,7 @@ const readConf = async () => {
     const encodedConfig = JSON.parse(readFileSync(resolve(".", ".app.config.json"), "utf-8")) as Conf;
     const masterKey = await getMasterKey();
     config = decryptMarkedFields(encodedConfig, masterKey) as Conf;
+    config.masterKey = masterKey;
   }
   return config;
 };

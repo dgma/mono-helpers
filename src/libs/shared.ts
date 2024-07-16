@@ -15,7 +15,14 @@ export const getRandomArbitrary = (min: number, max: number) => {
   return Math.random() * (max - min) + min;
 };
 
-export const getProfiles = () => JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
+let profiles: Profile;
+
+export const getProfiles = () => {
+  if (!profiles) {
+    profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
+  }
+  return profiles;
+};
 
 export const saveInFolder = (savePath: string, data: string) => {
   const parsedPath = savePath.split("/");
@@ -29,8 +36,16 @@ export const saveInFolder = (savePath: string, data: string) => {
   writeFileSync(savePath, data);
 };
 
-export const getMasterKey = async () => {
-  return existsSync("/run/secrets/master_key")
+let masterKey: string;
+
+const readMasterKey = async () =>
+  existsSync("/run/secrets/master_key")
     ? readFileSync(resolve("/run/secrets/master_key"), "utf-8")
     : await password({ message: "Enter master key" });
+
+export const getMasterKey = async () => {
+  if (!masterKey) {
+    masterKey = await readMasterKey();
+  }
+  return masterKey;
 };

@@ -19,7 +19,7 @@ const OKXChainToViem = {
   [OKX_WITHDRAW_CHAINS.base]: chains.base,
 };
 
-export const initFunding = async (
+const getEligibleFunding = async (
   filters: FundingFilter[],
   minBalance: number,
   maxBalance: number,
@@ -30,7 +30,6 @@ export const initFunding = async (
   const publicClient = getPublicClient(OKXChainToViem[withdrawChain]);
 
   const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
-
   const rawConfig = await Promise.all(
     Object.values(profiles).map(async (profile) => {
       const address = profile.wallets.evm.address as `0x${string}`;
@@ -57,21 +56,35 @@ export const initFunding = async (
     }),
   );
 
-  const config = rawConfig.filter((config) => parseFloat(config.amount) > 0);
+  console.log("accounts to fund", rawConfig.length);
 
-  if (config.length > 0) {
-    console.log("start funding process..");
+  return rawConfig.find(({ amount }) => amount !== "0");
+};
+
+export const initFunding = async (
+  filters: FundingFilter[],
+  minBalance: number,
+  maxBalance: number,
+  withdrawChain: WithdrawChain,
+) => {
+  const report = [];
+  let config = await getEligibleFunding(filters, minBalance, maxBalance, withdrawChain);
+
+  while (config) {
     await consolidateETH();
-    const data = await withdrawETH(config, 4 * 3600000, 8 * 3600000);
-    saveInFolder(
-      "./reports/withdrawals.report.json",
-      JSON.stringify(
-        {
-          [new Date().toISOString()]: data,
-        },
-        null,
-        2,
-      ),
-    );
+    const receipt = await withdrawETH(config, 4 * 3600000, 8 * 3600000);
+    report.push(receipt);
   }
+
+  // Todo: save each deposit
+  saveInFolder(
+    "./reports/withdrawals.report.json",
+    JSON.stringify(
+      {
+        [new Date().toISOString()]: report,
+      },
+      null,
+      2,
+    ),
+  );
 };

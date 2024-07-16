@@ -93,9 +93,11 @@ const getAccountToDeposit = async (
 ) => {
   const expenses = await getExpenses(publicClient);
   const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
-  return Promise.all(
+  const eligibleAccounts = await Promise.all(
     decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
-  ).then((accounts) => accounts.find(({ isEligible }) => isEligible));
+  ).then((accounts) => accounts.filter(({ isEligible }) => isEligible));
+  console.log("accounts to deposit", eligibleAccounts.length);
+  return eligibleAccounts[0];
 };
 
 export async function initDeposits(masterKey: string, minDeposit: number) {

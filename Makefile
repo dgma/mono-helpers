@@ -36,6 +36,6 @@ profiles :; npx tsx src/cli/profiles.ts
 
 recover :; npx tsx src/cli/profiles.ts
 
-encryptJson :; npx tsx src/cli/encryptJson.ts
+encryptJson :; export FILE=$(file) && export BACKUP=$(backup) && npx tsx src/cli/encryptJson.ts && unset FILE
 
 -include ${FCT_PLUGIN_PATH}/makefile-external

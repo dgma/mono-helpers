@@ -10,6 +10,7 @@ import { getMasterKey } from "src/libs/shared";
 import { JsonValue, JsonObj } from "src/types/common";
 
 (async function main() {
+  console.log("encryptJson script initiated");
   const file = resolve(".", process.env.FILE as string);
   const masterKey = await getMasterKey();
   const doBackup = process.env.BACKUP === "true";
@@ -26,5 +27,5 @@ import { JsonValue, JsonObj } from "src/types/common";
     writeFileSync(file, encrypt(String(data), masterKey));
   }
 
-  console.log("done");
+  console.log("encryptJson script finished");
 })();
