@@ -40,7 +40,7 @@ const generateAndSave = async (mnemonics: string[], networks: Networks[], master
     return acc;
   }, {} as Profile);
   fs.writeFileSync(
-    ".profiles.json",
+    ".profiles",
     encrypt(
       JSON.stringify({
         ...profiles,
