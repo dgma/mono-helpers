@@ -4,8 +4,7 @@ import axiosRetry from "axios-retry";
 import { refreshProxyAgent } from "./agent";
 import { headers, axiosInstance } from "./sham";
 import readConf from "src/conf";
-import { currentTime, markTime } from "src/libs/clock";
-import { sleep } from "src/libs/shared";
+import Clock from "src/libs/clock";
 import { WhoamiReport } from "src/types/proxify";
 
 async function logIpInfo(axiosInstance: AxiosInstance) {
@@ -17,11 +16,10 @@ const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
 });
 
+const localClock = new Clock();
+
 export async function refreshProxy(minWait = 10000) {
-  const timePassed = Date.now() - currentTime();
-  const waitTime = minWait - timePassed;
-  console.log(`wait ${waitTime}`);
-  await sleep(waitTime);
+  await localClock.sleepMax(minWait);
   await logIpInfo(await axiosInstance());
   await refreshProxyAgent();
   axiosRetry(axios, {
@@ -34,7 +32,7 @@ export async function refreshProxy(minWait = 10000) {
   const res = await axios.get(conf.proxy["reboot-linkᵻ"], { timeout: 120000, headers, httpsAgent });
   console.log(`new ip ${res.data.new_ip}`);
 
-  markTime();
+  localClock.markTime();
 
   return axiosInstance();
 }

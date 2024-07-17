@@ -1,6 +1,6 @@
 import { okx } from "ccxt";
 import readConf from "src/conf";
-import { OKXNetwork, WithdrawConfig } from "src/types/okx";
+import { OKXNetwork, WithdrawConfig, WithdrawChain } from "src/types/okx";
 
 let OKX: okx;
 
@@ -51,24 +51,16 @@ export const consolidateETH = async () => {
   }
 };
 
-export const withdrawETH = async (config: WithdrawConfig) => {
+export const EVMNetworksConfig = async (chain: WithdrawChain): Promise<OKXNetwork> => {
   const currencyNetworks = await (await getOKX()).fetchCurrencies();
-  const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[config.withdrawChain] as OKXNetwork;
-  if (ethNetworkConfig.fee > parseFloat(config.maxFee)) {
-    console.log(`Withdrawal fee is above allowed maximum ${config.maxFee}`);
-    return;
-  }
-  if (ethNetworkConfig.limits.withdraw.min > parseFloat(config.amount)) {
-    console.log(`Amount to withdraw ${config.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
-    return;
-  }
-  if (!ethNetworkConfig.withdraw) {
-    throw new Error(`Withdraw ETH for network ${config.withdrawChain} is disabled`);
-  }
+  const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[chain] as OKXNetwork;
+  return ethNetworkConfig;
+};
+
+export const withdrawETH = async (config: WithdrawConfig) => {
   const withdrawalParams = {
     amt: parseFloat(config.amount),
-    fee: ethNetworkConfig.fee,
-    chain: ethNetworkConfig.info.chain,
+    chain: config.chain,
   };
   console.log("withdraw with params", JSON.stringify(withdrawalParams));
   return (await getOKX()).withdraw("ETH", parseFloat(config.amount), config.address, undefined, withdrawalParams);

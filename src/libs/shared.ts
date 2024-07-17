@@ -49,3 +49,13 @@ export const getMasterKey = async () => {
   }
   return masterKey;
 };
+
+export const loopUntil = async (condition: () => Promise<boolean>, pause: number) => {
+  let isConditionAchieved = await condition();
+  while (!isConditionAchieved) {
+    console.log("loopUntil", pause);
+    await sleep(pause);
+    isConditionAchieved = await condition();
+  }
+  return isConditionAchieved;
+};
