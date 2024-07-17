@@ -29,9 +29,9 @@ up-all :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker
 # cli
 list :; npx tsx src/cli/list.ts
 
-encrypt :; export FILE=$(file) && export BACKUP=$(backup) && export OUTPUT=$(output) && npx tsx src/cli/encrypt.ts && unset FILE && unset OUTPUT
+encrypt :; export FILE=$(in) && export OUTPUT=$(out) && npx tsx src/cli/encrypt.ts && unset FILE && unset OUTPUT
 
-decrypt :; export FILE=$(file) && export BACKUP=$(backup) && export OUTPUT=$(output) && npx tsx src/cli/decrypt.ts && unset FILE && unset OUTPUT
+decrypt :; export FILE=$(in) && export OUTPUT=$(out) && npx tsx src/cli/decrypt.ts && unset FILE && unset OUTPUT
 
 funding :; npx tsx src/cli/funding.ts
 
