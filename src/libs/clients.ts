@@ -1,8 +1,8 @@
 import { AxiosInstance } from "axios";
-import { createWalletClient, http, publicActions, custom, createPublicClient } from "viem";
+import { createWalletClient, http, publicActions, custom, createPublicClient, PublicClient, WalletClient } from "viem";
 import * as chains from "viem/chains";
-import conf from "src/conf";
 import { Network as AlchemyNetwork } from "src/constants/alchemy";
+import { getAppConf } from "src/libs/configs";
 
 type ChainIdToAlchemyNetworksMap = {
   [prop: number]: AlchemyNetwork;
@@ -12,35 +12,61 @@ const chainIdToAlchemyNetworksMap: ChainIdToAlchemyNetworksMap = {
   [chains.mainnet.id]: AlchemyNetwork.ETH_MAINNET,
 };
 
-const transport = (chain: chains.Chain, proxy?: AxiosInstance) => {
+async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
   if (!proxy) {
     return http();
   }
 
+  const conf = await getAppConf();
+
   return custom({
     async request(body: { method: string; params: any[] }) {
       const response = await proxy.post(
-        `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.key}`,
+        `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`,
         body,
       );
       return response.data.result;
     },
   });
-};
+}
 
-export const getPublicClient = (chain: chains.Chain) =>
+let publicClient: PublicClient;
+
+const initiatePublicClient = (chain: chains.Chain) =>
   createPublicClient({
     batch: {
       multicall: {
         wait: 16,
       },
     },
+    cacheTime: 10_000,
     chain,
     transport: http(),
   });
 
-export const getClient = (chain: chains.Chain, proxy?: AxiosInstance) =>
-  createWalletClient({
+export const getPublicClient = (chain: chains.Chain) => {
+  if (!publicClient || publicClient.chain !== chain) {
+    publicClient = initiatePublicClient(chain);
+  }
+  return publicClient;
+};
+
+type CustomClient = PublicClient & WalletClient & { proxy?: AxiosInstance };
+
+let customClient: CustomClient;
+
+const initiateWalletClient = async (chain: chains.Chain, proxy?: AxiosInstance) => {
+  const client: CustomClient = createWalletClient({
     chain,
-    transport: transport(chain, proxy),
+    transport: await transport(chain, proxy),
   }).extend(publicActions);
+  client.proxy = proxy;
+  return client;
+};
+
+export const getClient = async (chain: chains.Chain, proxy?: AxiosInstance) => {
+  if (!customClient || customClient.chain !== chain || customClient.proxy !== proxy) {
+    customClient = await initiateWalletClient(chain, proxy);
+  }
+  return customClient;
+};

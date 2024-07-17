@@ -1,6 +1,6 @@
 # Profile generator
 
-Generates profiles (wallets) for different networks. The result is stored in `.profiles.json`:
+Generates profiles (wallets) for different networks. The result is stored in encrypted `.profiles` file. Decryption will generate the json:
 
 ```ts
 type Networks = "btc" | "evm" | "sol" | "tia" | "atom";
@@ -47,3 +47,10 @@ Recover profiles from mnemonics
 ```sh
 make recover
 ```
+
+Decrypt
+
+```sh
+make decrypt in=.profiles out=.profiles.json
+```
+

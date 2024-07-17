@@ -20,10 +20,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-.profiles.json
-.wallets.json
+.profiles
 .mnemonics.json
 reports/
 !src/**/*
-.app.config.json
+.app.secrets
 master_key

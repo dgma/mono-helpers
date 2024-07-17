@@ -18,11 +18,10 @@ export const headers = {
   "sec-fetch-site": "cross-site",
 };
 
-export function axiosInstance(
-  override: CreateAxiosDefaults = {
-    httpsAgent: getProxyAgent(),
-  },
-) {
+export async function axiosInstance(override: CreateAxiosDefaults = {}) {
+  if (!override.httpsAgent) {
+    override.httpsAgent = await getProxyAgent();
+  }
   return axios.create({
     ...override,
     headers: {

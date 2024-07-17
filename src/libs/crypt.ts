@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
+import { JsonValue } from "src/types/common";
 
-export const marker = "ᵻ";
+export const marker = "ᵻ" as const;
 
 const hash = (value: string, size = 32) => crypto.createHash("sha256").update(value).digest("hex").slice(0, size);
 
@@ -67,40 +68,5 @@ export function comparePasswords(storedPass: string, suppliedPass: string) {
   return crypto.timingSafeEqual(Buffer.from(storedPass), Buffer.from(suppliedPass));
 }
 
-type MixedObjectToCrypt = {
-  [prop: string]: string | MixedObjectToCrypt | null;
-};
-
-export const encryptMarkedFields = (value: MixedObjectToCrypt, masterKey: string) => {
-  return Object.entries(value).reduce((acc: MixedObjectToCrypt, [key, value]) => {
-    switch (true) {
-      case value && typeof value === "object":
-        acc[key] = encryptMarkedFields(value, masterKey);
-        break;
-      case typeof value === "string" && key[key.length - 1] === marker:
-        acc[key] = encrypt(value, masterKey);
-        break;
-      default:
-        acc[key] = value;
-        break;
-    }
-    return acc;
-  }, {});
-};
-
-export const decryptMarkedFields = (value: MixedObjectToCrypt, masterKey: string) => {
-  return Object.entries(value).reduce((acc: MixedObjectToCrypt, [key, value]) => {
-    switch (true) {
-      case typeof value === "object" && !!value:
-        acc[key] = decryptMarkedFields(value, masterKey);
-        break;
-      case typeof value === "string" && key[key.length - 1] === marker:
-        acc[key] = decrypt(value, masterKey);
-        break;
-      default:
-        acc[key] = value;
-        break;
-    }
-    return acc;
-  }, {});
-};
+export const decryptJson = (data: string, masterKey: string) =>
+  JSON.parse(decrypt(data, masterKey) as string) as JsonValue;

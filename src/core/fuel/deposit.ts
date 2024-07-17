@@ -1,23 +1,19 @@
-import { zeroAddress, parseEther, PublicClient, formatEther } from "viem";
+import { zeroAddress, parseEther, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { chainLinkAddresses } from "src/constants/chainlink";
 import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fuel";
 import { getPrice } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
-import { decryptMarkedFields } from "src/libs/crypt";
+import Clock from "src/libs/clock";
+import { getProfiles } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
-import { getRandomArbitrary, sleep, saveInFolder, getProfiles } from "src/libs/shared";
-import { Profile } from "src/types/profile";
+import { getRandomArbitrary, loopUntil } from "src/libs/shared";
 
 type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
 
 const chain = chains.mainnet;
-
-const getDecodedEVM = (profiles: Profile, masterKey: string) =>
-  Object.values(decryptMarkedFields(profiles, masterKey) as Profile).map(({ wallets }) => ({
-    ...(wallets.evm as EVMWallet),
-  }));
+const localClock = new Clock();
 
 const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const axiosInstance = await refreshProxy();
@@ -32,26 +28,27 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
     account,
   });
   const txHash = await walletClient.writeContract(request);
+  // const txHash: `0x${string}` = "0xasdasd";
   console.log(`tx send: ${txHash}`);
   return txHash;
 };
 
 type PrepareFnParams = {
-  publicClient: PublicClient;
   expenses: bigint;
   ethPrice: bigint;
   minDeposit: bigint;
 };
 
 const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
-  const userBalanceInFuel = await params.publicClient.readContract({
+  const publicClient = getPublicClient(chains.mainnet);
+  const userBalanceInFuel = await publicClient.readContract({
     address: FUEL_POINTS_CONTRACT,
     abi: FUEL_POINTS_CONTRACT_ABI,
     functionName: "getBalance",
     args: [wallet.address, zeroAddress],
   });
 
-  const balance = await params.publicClient.getBalance({
+  const balance = await publicClient.getBalance({
     address: wallet.address,
   });
 
@@ -67,7 +64,8 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
   };
 };
 
-const getExpenses = async (publicClient: PublicClient) => {
+const getExpenses = async () => {
+  const publicClient = getPublicClient(chains.mainnet);
   const depositCost = await publicClient.estimateContractGas({
     address: FUEL_POINTS_CONTRACT,
     abi: FUEL_POINTS_CONTRACT_ABI,
@@ -86,26 +84,33 @@ const getExpenses = async (publicClient: PublicClient) => {
   return (depositCost + withdrawCost) * 5n * (await publicClient.getGasPrice());
 };
 
-const getAccountToDeposit = async (
-  decodedEVMAccounts: ReturnType<typeof getDecodedEVM>,
-  publicClient: PublicClient,
-  minDeposit: number,
-) => {
-  const expenses = await getExpenses(publicClient);
-  const ethPrice = await getPrice(publicClient, chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
-  return Promise.all(
-    decodedEVMAccounts.map(prepare({ publicClient, expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
-  ).then((accounts) => accounts.find(({ isEligible }) => isEligible));
+// TODO: pass gas config
+const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: number) => {
+  await loopUntil(
+    async () => {
+      const gasPrice = await getPublicClient(chains.mainnet).getGasPrice();
+      return gasPrice < 8000000000n; // 8 gwei
+    },
+    5 * 60 * 1000,
+  );
+  const expenses = await getExpenses();
+  const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
+  const eligibleAccounts = await Promise.all(
+    decodedEVMAccounts.map(prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
+  ).then((accounts) => accounts.filter(({ isEligible }) => isEligible));
+  console.log("accounts to deposit", eligibleAccounts.length);
+  return eligibleAccounts[0];
 };
 
-export async function initDeposits(masterKey: string, minDeposit: number) {
-  const profiles = getProfiles();
-  const decodedEVMAccounts = getDecodedEVM(profiles, masterKey);
-  const publicClient = getPublicClient(chains.mainnet);
+export async function initDeposits(minDeposit: number) {
+  const profiles = await getProfiles();
+  const decodedEVMAccounts = Object.values(profiles).map(({ wallets }) => ({
+    ...(wallets.evm as EVMWallet),
+  }));
 
-  const report: { [prop: string]: { deposited: string; txHash: `0x${string}` } } = {};
+  const report: { [prop: string]: { deposited: string; txHash?: `0x${string}` } } = {};
 
-  let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
+  let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
 
   while (accountToDeposit !== undefined) {
     const txHash = await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
@@ -113,19 +118,8 @@ export async function initDeposits(masterKey: string, minDeposit: number) {
       deposited: formatEther(accountToDeposit.toDeposit),
       txHash,
     };
-    const pauseMs = getRandomArbitrary(3 * 3600000, 5 * 3600000);
-    console.log("sleep for", pauseMs);
-    await sleep(pauseMs);
-    accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, publicClient, minDeposit);
+    localClock.markTime();
+    accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
+    await localClock.sleepMax(getRandomArbitrary(3 * 3600000, 5 * 3600000));
   }
-  saveInFolder(
-    "./reports/withdrawals.report.json",
-    JSON.stringify(
-      {
-        [new Date().toISOString()]: report,
-      },
-      null,
-      2,
-    ),
-  );
 }

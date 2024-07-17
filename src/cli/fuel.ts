@@ -1,10 +1,9 @@
-import conf from "src/conf";
 import { initDeposits } from "src/core/fuel";
-import { getMasterKey } from "src/libs/shared";
+import { getAppConf } from "src/libs/configs";
 
 (async function main() {
-  const key = await getMasterKey();
-  console.log("initiated");
-  await initDeposits(key, conf.cli.fuel.minDeposit);
-  console.log("finished");
+  console.log("fuel script initiated");
+  const conf = await getAppConf();
+  await initDeposits(conf.cli.fuel.minDeposit);
+  console.log("fuel script finished");
 })();

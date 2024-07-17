@@ -4,8 +4,9 @@ import { zeroAddress, PublicClient, formatEther } from "viem";
 import * as chains from "viem/chains";
 import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fuel";
 import { getPublicClient } from "src/libs/clients";
+import { getProfiles } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
-import { getProfiles, saveInFolder } from "src/libs/shared";
+import { saveInFolder } from "src/libs/shared";
 
 export async function accountPoints(axiosInstance: AxiosInstance, address: string) {
   const scrollPoints = await axiosInstance.get<{
@@ -48,7 +49,7 @@ const refreshAndCall = (index: string, address: string, client: PublicClient) =>
 };
 
 export async function report(save: boolean) {
-  const profiles = getProfiles();
+  const profiles = await getProfiles();
   const client = getPublicClient(chains.mainnet);
 
   const data = await Object.entries(profiles).reduce(

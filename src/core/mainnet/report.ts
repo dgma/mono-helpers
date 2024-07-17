@@ -1,12 +1,13 @@
 import { formatEther } from "viem";
 import * as chains from "viem/chains";
 import { getPublicClient } from "src/libs/clients";
-import { getProfiles, saveInFolder } from "src/libs/shared";
+import { getProfiles } from "src/libs/configs";
+import { saveInFolder } from "src/libs/shared";
 
 type EthBalancesReport = { [prop: string]: string };
 
 export async function report(save: boolean) {
-  const profiles = getProfiles();
+  const profiles = await getProfiles();
   const publicClient = getPublicClient(chains.mainnet);
   const requests = Object.entries(profiles).map(async ([key, value]) => [
     key,

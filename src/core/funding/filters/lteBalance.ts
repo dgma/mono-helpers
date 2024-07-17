@@ -8,6 +8,6 @@ export const lteBalance = (minBalance: number) =>
     const balance = await client.getBalance({
       address,
     });
-    const ethPrice = await getPrice(client, chainLinkAddresses.ETHUSD[chains.mainnet.id], 1);
+    const ethPrice = await getPrice(client, chainLinkAddresses.ETHUSD[chains.mainnet.id], 0);
     return ethPrice * balance <= parseEther(String(minBalance));
   };

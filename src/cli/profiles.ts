@@ -1,7 +1,11 @@
-import { password } from "@inquirer/prompts";
-import conf from "src/conf";
 import { createProfiles } from "src/core/profiles";
+import { getAppConf } from "src/libs/configs";
+import { getMasterKey } from "src/libs/shared";
 
-const key = await password({ message: "Enter master key" });
-
-await createProfiles(conf.cli.profiles.amount, conf.cli.profiles.chains, key);
+(async function main() {
+  console.log("profiles script initiated");
+  const conf = await getAppConf();
+  const masterKey = await getMasterKey();
+  await createProfiles(conf.cli.profiles.amount, conf.cli.profiles.chains, masterKey);
+  console.log("profiles script finished");
+})();
