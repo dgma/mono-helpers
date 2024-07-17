@@ -8,9 +8,9 @@
       ],
       "depositRange": [
         30,
-        170
+        120
       ],
-      "lteBalance": 30,
+      "lteBalance": 50,
       "maxFee": 2
     },
     "fuel": {
