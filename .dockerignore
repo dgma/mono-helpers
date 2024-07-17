@@ -13,5 +13,5 @@ eslint*
 .editorconfig
 .prettierrc
 LICENSE
-.app.config.example.json
+app.secrets.example.json
 master_key
