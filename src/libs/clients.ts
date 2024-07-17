@@ -12,19 +12,20 @@ const chainIdToAlchemyNetworksMap: ChainIdToAlchemyNetworksMap = {
   [chains.mainnet.id]: AlchemyNetwork.ETH_MAINNET,
 };
 
-async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
-  if (!proxy) {
-    return http();
-  }
-
+const getRpcUrl = async (chain: chains.Chain) => {
   const conf = await getAppConf();
+  return `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`;
+};
+
+async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
+  const rpcUrl = await getRpcUrl(chain);
+  if (!proxy) {
+    return http(rpcUrl);
+  }
 
   return custom({
     async request(body: { method: string; params: any[] }) {
-      const response = await proxy.post(
-        `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`,
-        body,
-      );
+      const response = await proxy.post(rpcUrl, body);
       return response.data.result;
     },
   });
@@ -32,21 +33,21 @@ async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
 
 let publicClient: PublicClient;
 
-const initiatePublicClient = (chain: chains.Chain) =>
+const initiatePublicClient = async (chain: chains.Chain) =>
   createPublicClient({
     batch: {
       multicall: {
-        wait: 16,
+        wait: 100,
       },
     },
-    cacheTime: 10_000,
+    cacheTime: 60_000,
     chain,
-    transport: http(),
+    transport: http(await getRpcUrl(chain)),
   });
 
-export const getPublicClient = (chain: chains.Chain) => {
+export const getPublicClient = async (chain: chains.Chain) => {
   if (!publicClient || publicClient.chain !== chain) {
-    publicClient = initiatePublicClient(chain);
+    publicClient = await initiatePublicClient(chain);
   }
   return publicClient;
 };

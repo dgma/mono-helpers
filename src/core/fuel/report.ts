@@ -50,7 +50,7 @@ const refreshAndCall = (index: string, address: string, client: PublicClient) =>
 
 export async function report(save: boolean) {
   const profiles = await getProfiles();
-  const client = getPublicClient(chains.mainnet);
+  const client = await getPublicClient(chains.mainnet);
 
   const data = await Object.entries(profiles).reduce(
     (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address!, client)),

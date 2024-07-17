@@ -40,7 +40,7 @@ type PrepareFnParams = {
 };
 
 const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
-  const publicClient = getPublicClient(chains.mainnet);
+  const publicClient = await getPublicClient(chains.mainnet);
   const userBalanceInFuel = await publicClient.readContract({
     address: FUEL_POINTS_CONTRACT,
     abi: FUEL_POINTS_CONTRACT_ABI,
@@ -65,7 +65,7 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
 };
 
 const getExpenses = async () => {
-  const publicClient = getPublicClient(chains.mainnet);
+  const publicClient = await getPublicClient(chains.mainnet);
   const depositCost = await publicClient.estimateContractGas({
     address: FUEL_POINTS_CONTRACT,
     abi: FUEL_POINTS_CONTRACT_ABI,
@@ -88,13 +88,17 @@ const getExpenses = async () => {
 const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: number) => {
   await loopUntil(
     async () => {
-      const gasPrice = await getPublicClient(chains.mainnet).getGasPrice();
+      const gasPrice = await (await getPublicClient(chains.mainnet)).getGasPrice();
       return gasPrice < 8000000000n; // 8 gwei
     },
     5 * 60 * 1000,
   );
   const expenses = await getExpenses();
-  const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
+  const ethPrice = await getPrice(
+    await getPublicClient(chains.mainnet),
+    chainLinkAddresses.ETHUSD[chains.mainnet.id],
+    18,
+  );
   const eligibleAccounts = await Promise.all(
     decodedEVMAccounts.map(prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
   ).then((accounts) => accounts.filter(({ isEligible }) => isEligible));

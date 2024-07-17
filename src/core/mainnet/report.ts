@@ -8,7 +8,7 @@ type EthBalancesReport = { [prop: string]: string };
 
 export async function report(save: boolean) {
   const profiles = await getProfiles();
-  const publicClient = getPublicClient(chains.mainnet);
+  const publicClient = await getPublicClient(chains.mainnet);
   const requests = Object.entries(profiles).map(async ([key, value]) => [
     key,
     formatEther(

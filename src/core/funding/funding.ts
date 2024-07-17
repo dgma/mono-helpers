@@ -30,16 +30,26 @@ type Params = {
 
 const localClock = new Clock();
 
+const amountGeZero = ({ amount }: { amount: string }) => amount !== "0";
+
 const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => {
   const profiles = await getProfiles();
 
-  const publicClient = getPublicClient(OKXChainToViem[chain]);
+  const publicClient = await getPublicClient(OKXChainToViem[chain]);
 
-  const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
+  const ethPrice = await getPrice(
+    await getPublicClient(chains.mainnet),
+    chainLinkAddresses.ETHUSD[chains.mainnet.id],
+    18,
+  );
   await loopUntil(
     async () => {
       const evmChainConfig = await EVMNetworksConfig(chain);
-      const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 0);
+      const ethPrice = await getPrice(
+        await getPublicClient(chains.mainnet),
+        chainLinkAddresses.ETHUSD[chains.mainnet.id],
+        0,
+      );
       const maxFeeConverted = parseFloat(formatEther(parseEther(String(maxFee)) / ethPrice));
       if (maxFeeConverted <= evmChainConfig.fee) {
         console.log(`Withdrawal fee is above allowed maximum ${maxFee}`);
@@ -57,6 +67,7 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
     },
     5 * 60 * 1000,
   );
+  const evmChainConfig = await EVMNetworksConfig(chain);
   const rawConfig = await Promise.all(
     Object.values(profiles).map(async (profile) => {
       const address = profile.wallets.evm.address as `0x${string}`;
@@ -69,7 +80,8 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
           return {
             address,
             amount: "0",
-            chain,
+            chain: evmChainConfig.id,
+            fee: "0",
           };
         }
       }
@@ -78,14 +90,15 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
       return {
         address,
         amount: formatEther(expectedBalance - balance),
-        chain,
+        chain: evmChainConfig.id,
+        fee: String(evmChainConfig.fee),
       };
     }),
   );
 
-  console.log("accounts to fund", rawConfig.length);
+  console.log("accounts to fund", rawConfig.filter(amountGeZero).length);
 
-  return rawConfig.find(({ amount }) => amount !== "0");
+  return rawConfig.find(amountGeZero);
 };
 
 export const initFunding = async (params: Params) => {

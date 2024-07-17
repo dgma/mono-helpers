@@ -59,8 +59,9 @@ export const EVMNetworksConfig = async (chain: WithdrawChain): Promise<OKXNetwor
 
 export const withdrawETH = async (config: WithdrawConfig) => {
   const withdrawalParams = {
-    amt: parseFloat(config.amount),
+    amt: config.amount,
     chain: config.chain,
+    fee: config.fee,
   };
   console.log("withdraw with params", JSON.stringify(withdrawalParams));
   return (await getOKX()).withdraw("ETH", parseFloat(config.amount), config.address, undefined, withdrawalParams);

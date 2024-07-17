@@ -44,5 +44,6 @@ export type OKXNetwork = {
 export type WithdrawConfig = {
   address: `0x${string}`;
   amount: string;
-  chain: WithdrawChain;
+  chain: string;
+  fee: string;
 };
