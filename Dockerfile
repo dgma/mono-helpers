@@ -11,7 +11,7 @@ RUN npm ci
 
 # Rebuild the source code only when needed
 FROM node:20-alpine
-RUN apk update && apk add --no-cache make
+RUN apk update && apk add --no-cache make && apk add --no-cache bash
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
