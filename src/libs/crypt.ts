@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { JsonObj } from "src/types/common";
+import { JsonValue } from "src/types/common";
 
 export const marker = "ᵻ" as const;
 
@@ -68,38 +68,5 @@ export function comparePasswords(storedPass: string, suppliedPass: string) {
   return crypto.timingSafeEqual(Buffer.from(storedPass), Buffer.from(suppliedPass));
 }
 
-// TODO: array values encryption
-export const encryptMarkedFields = (value: JsonObj, masterKey: string) => {
-  return Object.entries(value).reduce((acc: JsonObj, [key, value]) => {
-    switch (true) {
-      case value && typeof value === "object" && !Array.isArray(value):
-        acc[key] = encryptMarkedFields(value as JsonObj, masterKey);
-        break;
-      case typeof value === "string" && key[key.length - 1] === marker:
-        acc[key] = encrypt(value, masterKey);
-        break;
-      default:
-        acc[key] = value;
-        break;
-    }
-    return acc;
-  }, {});
-};
-
-// TODO: array values decryption
-export const decryptMarkedFields = (value: JsonObj, masterKey: string) => {
-  return Object.entries(value).reduce((acc: JsonObj, [key, value]) => {
-    switch (true) {
-      case !!value && typeof value === "object" && !Array.isArray(value):
-        acc[key] = decryptMarkedFields(value as JsonObj, masterKey);
-        break;
-      case typeof value === "string" && key[key.length - 1] === marker:
-        acc[key] = decrypt(value, masterKey);
-        break;
-      default:
-        acc[key] = value;
-        break;
-    }
-    return acc;
-  }, {});
-};
+export const decryptJson = (data: string, masterKey: string) =>
+  JSON.parse(decrypt(data, masterKey) as string) as JsonValue;

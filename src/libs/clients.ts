@@ -1,8 +1,8 @@
 import { AxiosInstance } from "axios";
 import { createWalletClient, http, publicActions, custom, createPublicClient, PublicClient, WalletClient } from "viem";
 import * as chains from "viem/chains";
-import readConf from "src/conf";
 import { Network as AlchemyNetwork } from "src/constants/alchemy";
+import { getAppConf } from "src/libs/configs";
 
 type ChainIdToAlchemyNetworksMap = {
   [prop: number]: AlchemyNetwork;
@@ -17,7 +17,7 @@ async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
     return http();
   }
 
-  const conf = await readConf();
+  const conf = await getAppConf();
 
   return custom({
     async request(body: { method: string; params: any[] }) {

@@ -1,12 +1,12 @@
 import { okx } from "ccxt";
-import readConf from "src/conf";
+import { getAppConf } from "src/libs/configs";
 import { OKXNetwork, WithdrawConfig, WithdrawChain } from "src/types/okx";
 
 let OKX: okx;
 
 const getOKX = async () => {
   if (!OKX) {
-    const conf = await readConf();
+    const conf = await getAppConf();
     OKX = new okx({
       apiKey: conf.okx.keyᵻ,
       secret: conf.okx.secretᵻ,

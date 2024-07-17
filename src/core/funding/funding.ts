@@ -5,8 +5,9 @@ import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 import { getPrice } from "src/libs/chainlink";
 import { getPublicClient } from "src/libs/clients";
 import Clock from "src/libs/clock";
+import { getProfiles } from "src/libs/configs";
 import { withdrawETH, consolidateETH, EVMNetworksConfig } from "src/libs/okx";
-import { getRandomArbitrary, getProfiles, loopUntil } from "src/libs/shared";
+import { getRandomArbitrary, loopUntil } from "src/libs/shared";
 import { FundingFilter } from "src/types/funding";
 import { WithdrawChain } from "src/types/okx";
 
@@ -30,7 +31,7 @@ type Params = {
 const localClock = new Clock();
 
 const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => {
-  const profiles = getProfiles();
+  const profiles = await getProfiles();
 
   const publicClient = getPublicClient(OKXChainToViem[chain]);
 

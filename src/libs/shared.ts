@@ -1,7 +1,6 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { password } from "@inquirer/prompts";
-import { Profile } from "src/types/profile";
 
 export const sleep = (time: number = 1000) =>
   new Promise((resolve) => {
@@ -13,15 +12,6 @@ export const getRandomArbitrary = (min: number, max: number) => {
     throw new Error("max should be above min");
   }
   return Math.random() * (max - min) + min;
-};
-
-let profiles: Profile;
-
-export const getProfiles = () => {
-  if (!profiles) {
-    profiles = JSON.parse(readFileSync(resolve(".", ".profiles.json"), "utf-8")) as Profile;
-  }
-  return profiles;
 };
 
 export const saveInFolder = (savePath: string, data: string) => {

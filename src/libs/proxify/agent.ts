@@ -1,5 +1,5 @@
 import { HttpsProxyAgent } from "hpagent";
-import readConf from "src/conf";
+import { getAppConf } from "src/libs/configs";
 
 let agent: HttpsProxyAgent;
 
@@ -23,6 +23,6 @@ export function refreshProxyAgent() {
 }
 
 export async function getURI() {
-  const { proxy } = await readConf();
+  const { proxy } = await getAppConf();
   return `http://${proxy.userᵻ}:${proxy.passᵻ}@${proxy.hostᵻ}:${proxy.portᵻ}`;
 }

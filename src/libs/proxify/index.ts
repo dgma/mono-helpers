@@ -3,8 +3,8 @@ import axios, { AxiosInstance } from "axios";
 import axiosRetry from "axios-retry";
 import { refreshProxyAgent } from "./agent";
 import { headers, axiosInstance } from "./sham";
-import readConf from "src/conf";
 import Clock from "src/libs/clock";
+import { getAppConf } from "src/libs/configs";
 import { WhoamiReport } from "src/types/proxify";
 
 async function logIpInfo(axiosInstance: AxiosInstance) {
@@ -28,7 +28,7 @@ export async function refreshProxy(minWait = 10000) {
       return retryCount * 1000;
     },
   });
-  const conf = await readConf();
+  const conf = await getAppConf();
   const res = await axios.get(conf.proxy["reboot-linkᵻ"], { timeout: 120000, headers, httpsAgent });
   console.log(`new ip ${res.data.new_ip}`);
 

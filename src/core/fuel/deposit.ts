@@ -6,20 +6,14 @@ import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fu
 import { getPrice } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
 import Clock from "src/libs/clock";
-import { decryptMarkedFields } from "src/libs/crypt";
+import { getProfiles } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
-import { getRandomArbitrary, getProfiles, loopUntil } from "src/libs/shared";
-import { Profile } from "src/types/profile";
+import { getRandomArbitrary, loopUntil } from "src/libs/shared";
 
 type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
 
 const chain = chains.mainnet;
 const localClock = new Clock();
-
-const getDecodedEVM = (profiles: Profile, masterKey: string) =>
-  Object.values(decryptMarkedFields(profiles, masterKey) as Profile).map(({ wallets }) => ({
-    ...(wallets.evm as EVMWallet),
-  }));
 
 const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const axiosInstance = await refreshProxy();
@@ -91,7 +85,7 @@ const getExpenses = async () => {
 };
 
 // TODO: pass gas config
-const getAccountToDeposit = async (decodedEVMAccounts: ReturnType<typeof getDecodedEVM>, minDeposit: number) => {
+const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: number) => {
   await loopUntil(
     async () => {
       const gasPrice = await getPublicClient(chains.mainnet).getGasPrice();
@@ -108,11 +102,13 @@ const getAccountToDeposit = async (decodedEVMAccounts: ReturnType<typeof getDeco
   return eligibleAccounts[0];
 };
 
-export async function initDeposits(masterKey: string, minDeposit: number) {
-  const profiles = getProfiles();
-  const decodedEVMAccounts = getDecodedEVM(profiles, masterKey);
+export async function initDeposits(minDeposit: number) {
+  const profiles = await getProfiles();
+  const decodedEVMAccounts = Object.values(profiles).map(({ wallets }) => ({
+    ...(wallets.evm as EVMWallet),
+  }));
 
-  const report: { [prop: string]: { deposited: string; txHash: `0x${string}` } } = {};
+  const report: { [prop: string]: { deposited: string; txHash?: `0x${string}` } } = {};
 
   let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
 

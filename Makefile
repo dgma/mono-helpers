@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: init build clear lint typecheck test pre-commit pre-push migrate up list funding fuel report profiles recover encryptJson
+.PHONY: init build clear lint typecheck test pre-commit pre-push migrate up up-all list funding fuel report profiles recover decrypt encrypt
 
 all: init clean typecheck test
 
@@ -29,6 +29,10 @@ up-all :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker
 # cli
 list :; npx tsx src/cli/list.ts
 
+encrypt :; export FILE=$(file) && export BACKUP=$(backup) && npx tsx src/cli/encrypt.ts && unset FILE
+
+decrypt :; export FILE=$(file) && export BACKUP=$(backup) && npx tsx src/cli/decrypt.ts && unset FILE
+
 funding :; npx tsx src/cli/funding.ts
 
 fuel :; npx tsx src/cli/fuel.ts
@@ -38,7 +42,5 @@ report :; npx tsx src/cli/report.ts
 profiles :; npx tsx src/cli/profiles.ts
 
 recover :; npx tsx src/cli/profiles.ts
-
-encryptJson :; export FILE=$(file) && export BACKUP=$(backup) && npx tsx src/cli/encryptJson.ts && unset FILE
 
 -include ${FCT_PLUGIN_PATH}/makefile-external

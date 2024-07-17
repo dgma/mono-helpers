@@ -1,12 +1,12 @@
-import readConf from "src/conf";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 import { initFunding } from "src/core/funding";
 import { noFuel, onlyZero, lteBalance } from "src/core/funding/filters";
+import { getAppConf } from "src/libs/configs";
 import { FundingFilter } from "src/types/funding";
 
 (async function main() {
   console.log("funding script initiated");
-  const conf = await readConf();
+  const conf = await getAppConf();
   const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter; lteBalance: FundingFilter } = {
     noFuel,
     onlyZero,
