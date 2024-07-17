@@ -15,7 +15,8 @@ import { getMasterKey } from "src/libs/shared";
   }
 
   const decryptedJson = decryptJson(readFileSync(file, "utf-8"), masterKey);
-  writeFileSync(file, JSON.stringify(decryptedJson, null, 2));
+  const output = resolve(".", process.env.OUTPUT as string);
+  writeFileSync(output, JSON.stringify(decryptedJson, null, 2));
 
   console.log("decrypt script finished");
 })();

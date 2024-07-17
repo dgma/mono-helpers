@@ -14,7 +14,8 @@ import { getMasterKey } from "src/libs/shared";
     await copyFile(file, resolve(".", "decoded.backup.json"));
   }
 
-  writeFileSync(file, encrypt(readFileSync(file, "utf-8"), masterKey));
+  const output = resolve(".", process.env.OUTPUT as string);
+  writeFileSync(file, encrypt(readFileSync(output, "utf-8"), masterKey));
 
   console.log("encrypt script finished");
 })();
