@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 -include .env
 
 .PHONY: init build clear lint typecheck test pre-commit pre-push migrate up up-all list funding fuel report profiles recover decrypt encrypt
