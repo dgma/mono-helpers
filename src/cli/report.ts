@@ -13,7 +13,7 @@ const reportExecutors = {
   console.log("report script initiated");
   const conf = await readConf();
   for (let reportType of conf.cli.report.type) {
-    await reportExecutors[reportType](conf.cli.report.save);
+    await reportExecutors[reportType](conf.cli.report.save ?? false);
   }
   console.log("report script finished");
 })();

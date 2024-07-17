@@ -68,10 +68,11 @@ export function comparePasswords(storedPass: string, suppliedPass: string) {
   return crypto.timingSafeEqual(Buffer.from(storedPass), Buffer.from(suppliedPass));
 }
 
+// TODO: array values encryption
 export const encryptMarkedFields = (value: JsonObj, masterKey: string) => {
   return Object.entries(value).reduce((acc: JsonObj, [key, value]) => {
     switch (true) {
-      case value && typeof value === "object":
+      case value && typeof value === "object" && !Array.isArray(value):
         acc[key] = encryptMarkedFields(value as JsonObj, masterKey);
         break;
       case typeof value === "string" && key[key.length - 1] === marker:
@@ -85,10 +86,11 @@ export const encryptMarkedFields = (value: JsonObj, masterKey: string) => {
   }, {});
 };
 
+// TODO: array values decryption
 export const decryptMarkedFields = (value: JsonObj, masterKey: string) => {
   return Object.entries(value).reduce((acc: JsonObj, [key, value]) => {
     switch (true) {
-      case typeof value === "object" && !!value:
+      case !!value && typeof value === "object" && !Array.isArray(value):
         acc[key] = decryptMarkedFields(value as JsonObj, masterKey);
         break;
       case typeof value === "string" && key[key.length - 1] === marker:

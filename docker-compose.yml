@@ -3,11 +3,13 @@ version: "3.7"
 services:
   funding:
     image: mono
-    restart: always
+    # restart: always
     build:
       context: .
     command: ["make", "funding"]
-    logging:
+    secrets:
+      - master_key
+    logging: &loggin
       driver: "json-file"
       options:
         max-file: "5"
@@ -18,13 +20,9 @@ services:
     build:
       context: .
     command: ["make", "fuel"]
-    logging:
-      driver: "json-file"
-      options:
-        max-file: "5"
-        max-size: "100m"
+    logging: *loggin
     secrets:
       - master_key
 secrets:
   master_key:
-    environment: MASTER_KEY
+    file: ./master_key

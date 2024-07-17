@@ -10,13 +10,17 @@ import { FundingFilter } from "src/types/funding";
   const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter; lteBalance: FundingFilter } = {
     noFuel,
     onlyZero,
-    lteBalance: lteBalance(conf.cli.funding.lteBalance),
+    lteBalance: lteBalance(conf.cli.funding.lteBalance ?? 0),
   };
 
   const filters = conf.cli.funding.filters.map((filter) => fFiltersMap[filter]);
 
-  const [minAmount, maxAmount] = conf.cli.funding.depositRange;
   const chain = conf.cli.funding.chain;
-  await initFunding(filters, minAmount, maxAmount, OKX_WITHDRAW_CHAINS[chain]);
+  await initFunding({
+    filters,
+    range: conf.cli.funding.depositRange,
+    chain: OKX_WITHDRAW_CHAINS[chain],
+    maxFee: conf.cli.funding.maxFee,
+  });
   console.log("funding script finished");
 })();

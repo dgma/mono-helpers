@@ -32,6 +32,7 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
     account,
   });
   const txHash = await walletClient.writeContract(request);
+  // const txHash: `0x${string}` = "0xasdasd";
   console.log(`tx send: ${txHash}`);
   return txHash;
 };

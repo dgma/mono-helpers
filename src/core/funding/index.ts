@@ -5,7 +5,7 @@ import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 import { getPrice } from "src/libs/chainlink";
 import { getPublicClient } from "src/libs/clients";
 import { withdrawETH, consolidateETH } from "src/libs/okx";
-import { getRandomArbitrary, saveInFolder, getProfiles } from "src/libs/shared";
+import { getRandomArbitrary, saveInFolder, getProfiles, sleep } from "src/libs/shared";
 import { FundingFilter } from "src/types/funding";
 import { WithdrawChain } from "src/types/okx";
 
@@ -19,15 +19,17 @@ const OKXChainToViem = {
   [OKX_WITHDRAW_CHAINS.base]: chains.base,
 };
 
-const getEligibleFunding = async (
-  filters: FundingFilter[],
-  minBalance: number,
-  maxBalance: number,
-  withdrawChain: WithdrawChain,
-) => {
+type Params = {
+  filters: FundingFilter[];
+  range: [number, number];
+  chain: WithdrawChain;
+  maxFee: number;
+};
+
+const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => {
   const profiles = getProfiles();
 
-  const publicClient = getPublicClient(OKXChainToViem[withdrawChain]);
+  const publicClient = getPublicClient(OKXChainToViem[chain]);
 
   const ethPrice = await getPrice(getPublicClient(chains.mainnet), chainLinkAddresses.ETHUSD[chains.mainnet.id], 18);
   const rawConfig = await Promise.all(
@@ -42,16 +44,19 @@ const getEligibleFunding = async (
           return {
             address,
             amount: "0",
-            withdrawChain,
+            withdrawChain: chain,
+            maxFee: "0",
           };
         }
       }
-      const usdTargetBalance = String(getRandomArbitrary(minBalance, maxBalance));
+      const usdTargetBalance = String(getRandomArbitrary(range[0], range[1]));
       const expectedBalance = (10n ** 18n * parseEther(usdTargetBalance)) / ethPrice;
+      const maxFeeConverted = formatEther((10n ** 18n * parseEther(String(maxFee))) / ethPrice);
       return {
         address,
         amount: formatEther(expectedBalance - balance),
-        withdrawChain,
+        withdrawChain: chain,
+        maxFee: maxFeeConverted,
       };
     }),
   );
@@ -61,19 +66,17 @@ const getEligibleFunding = async (
   return rawConfig.find(({ amount }) => amount !== "0");
 };
 
-export const initFunding = async (
-  filters: FundingFilter[],
-  minBalance: number,
-  maxBalance: number,
-  withdrawChain: WithdrawChain,
-) => {
+export const initFunding = async (params: Params) => {
   const report = [];
-  let config = await getEligibleFunding(filters, minBalance, maxBalance, withdrawChain);
+  let config = await getEligibleFunding(params);
 
   while (config) {
     await consolidateETH();
-    const receipt = await withdrawETH(config, 4 * 3600000, 8 * 3600000);
+    const receipt = await withdrawETH(config);
     report.push(receipt);
+    const pauseMs = getRandomArbitrary(4 * 3600000, 8 * 3600000);
+    console.log("sleep for", pauseMs);
+    await sleep(pauseMs);
   }
 
   // Todo: save each deposit

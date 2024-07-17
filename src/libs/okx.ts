@@ -1,6 +1,5 @@
 import { okx } from "ccxt";
 import readConf from "src/conf";
-import { getRandomArbitrary, sleep } from "src/libs/shared";
 import { OKXNetwork, WithdrawConfig } from "src/types/okx";
 
 let OKX: okx;
@@ -52,14 +51,16 @@ export const consolidateETH = async () => {
   }
 };
 
-export const withdrawETH = async (config: WithdrawConfig, minDelay: number, maxDelay: number) => {
+export const withdrawETH = async (config: WithdrawConfig) => {
   const currencyNetworks = await (await getOKX()).fetchCurrencies();
-  const pauseMs = getRandomArbitrary(minDelay, maxDelay);
-  console.log("sleep for", pauseMs);
-  await sleep(pauseMs);
   const ethNetworkConfig = (currencyNetworks.ETH.networks as any)[config.withdrawChain] as OKXNetwork;
+  if (ethNetworkConfig.fee > parseFloat(config.maxFee)) {
+    console.log(`Withdrawal fee is above allowed maximum ${config.maxFee}`);
+    return;
+  }
   if (ethNetworkConfig.limits.withdraw.min > parseFloat(config.amount)) {
-    throw new Error(`Amount to withdraw ${config.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
+    console.log(`Amount to withdraw ${config.amount} is below ${ethNetworkConfig.limits.withdraw.min}`);
+    return;
   }
   if (!ethNetworkConfig.withdraw) {
     throw new Error(`Withdraw ETH for network ${config.withdrawChain} is disabled`);

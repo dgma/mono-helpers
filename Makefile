@@ -1,6 +1,6 @@
 -include .env
 
-.PHONY: init build clear lint typecheck test pre-commit pre-push dev list wallet tx
+.PHONY: init build clear lint typecheck test pre-commit pre-push migrate up list funding fuel report profiles recover encryptJson
 
 all: init clean typecheck test
 
@@ -21,8 +21,11 @@ pre-push : lint typecheck test
 
 migrate :; npx tsx src/migrations/$(script).ts
 
-up :; read -s -r -e -p "MASTER_KEY: " MASTER_KEY && MASTER_KEY=${MASTER_KEY} docker compose up -d && unset MASTER_KEY && docker compose logs -f
+service?=fuel
 
+up :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose up -d $(service) && unset REPLY && docker compose logs -f $(service); rm -rf master_key
+
+up-all :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose up -d && unset REPLY && docker compose logs -f; rm -rf master_key
 # cli
 list :; npx tsx src/cli/list.ts
 

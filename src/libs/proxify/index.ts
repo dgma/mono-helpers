@@ -23,7 +23,7 @@ export async function refreshProxy(minWait = 10000) {
   console.log(`wait ${waitTime}`);
   await sleep(waitTime);
   await logIpInfo(await axiosInstance());
-  refreshProxyAgent();
+  await refreshProxyAgent();
   axiosRetry(axios, {
     retries: 3,
     retryDelay: (retryCount) => {

@@ -40,7 +40,7 @@ let masterKey: string;
 
 const readMasterKey = async () =>
   existsSync("/run/secrets/master_key")
-    ? readFileSync(resolve("/run/secrets/master_key"), "utf-8")
+    ? readFileSync(resolve("/run/secrets/master_key"), "utf-8").trimEnd()
     : await password({ message: "Enter master key" });
 
 export const getMasterKey = async () => {
