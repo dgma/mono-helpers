@@ -24,5 +24,5 @@ yarn-error.log*
 .mnemonics.json
 reports/
 !src/**/*
-.app.config
+.app.secrets
 master_key

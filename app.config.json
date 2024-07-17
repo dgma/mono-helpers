@@ -1,0 +1,38 @@
+{
+  "cli": {
+    "funding": {
+      "chain": "eth",
+      "filters": [
+        "noFuel",
+        "lteBalance"
+      ],
+      "depositRange": [
+        30,
+        170
+      ],
+      "lteBalance": 30,
+      "maxFee": 2
+    },
+    "fuel": {
+      "minDeposit": 30
+    },
+    "report": {
+      "type": [
+        "l1Balance",
+        "scroll",
+        "fuel"
+      ],
+      "save": true
+    },
+    "profiles": {
+      "amount": 60,
+      "chains": [
+        "btc",
+        "evm",
+        "sol",
+        "tia",
+        "atom"
+      ]
+    }
+  }
+}
