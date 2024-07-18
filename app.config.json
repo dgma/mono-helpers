@@ -17,12 +17,15 @@
       "minDeposit": 30
     },
     "report": {
-      "type": [
-        "l1Balance",
-        "scroll",
-        "fuel"
-      ],
-      "save": true
+      "mainnet": {
+        "params": [
+          "fuel"
+        ],
+        "save": true
+      },
+      "scroll": {
+        "save": true
+      }
     },
     "profiles": {
       "amount": 60,

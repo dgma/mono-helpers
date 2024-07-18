@@ -18,6 +18,11 @@ export type Profile = {
   };
 };
 
+export type ReportConf = {
+  readonly scroll: { readonly save: boolean };
+  readonly mainnet: { readonly params: string[]; readonly save: boolean };
+};
+
 export type AppConfig = {
   proxy: {
     userᵻ: string;
@@ -47,10 +52,7 @@ export type AppConfig = {
     fuel: {
       minDeposit: number;
     };
-    report: {
-      type: ("l1Balance" | "scroll" | "fuel")[];
-      save?: boolean;
-    };
+    report: ReportConf;
     profiles: {
       amount: number;
       chains: Networks[];
