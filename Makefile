@@ -39,6 +39,8 @@ funding :; npx tsx src/cli/funding.ts
 
 fuel :; npx tsx src/cli/fuel.ts
 
+scroll-kelp :; npx tsx src/cli/scroll.kelp.ts
+
 report :; npx tsx src/cli/report.ts
 
 profiles :; npx tsx src/cli/profiles.ts

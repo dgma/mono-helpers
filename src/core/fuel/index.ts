@@ -1,1 +1,1 @@
-export { initDeposits } from "./deposit";
+export { initFuelDeposits } from "./deposit.fuel";

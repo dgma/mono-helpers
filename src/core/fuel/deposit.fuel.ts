@@ -107,7 +107,7 @@ const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: 
   return eligibleAccounts[0];
 };
 
-export async function initDeposits(minDeposit: number) {
+export async function initFuelDeposits(minDeposit: number) {
   const profiles = await getProfiles();
   const decodedEVMAccounts = Object.values(profiles).map(({ wallets }) => ({
     ...(wallets.evm as EVMWallet),

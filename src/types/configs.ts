@@ -52,6 +52,11 @@ export type AppConfig = {
     fuel: {
       minDeposit: number;
     };
+    scroll: {
+      kelp: {
+        minDeposit: number;
+      };
+    };
     report: ReportConf;
     profiles: {
       amount: number;

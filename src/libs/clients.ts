@@ -14,7 +14,12 @@ const chainIdToAlchemyNetworksMap: ChainIdToAlchemyNetworksMap = {
 
 const getRpcUrl = async (chain: chains.Chain) => {
   const conf = await getAppConf();
-  return `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`;
+  switch (chain.id) {
+    case chains.scroll.id:
+      return chains.scroll.rpcUrls.default.http[0];
+    default:
+      return `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`;
+  }
 };
 
 async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
@@ -46,7 +51,7 @@ const initiatePublicClient = async (chain: chains.Chain) =>
   });
 
 export const getPublicClient = async (chain: chains.Chain) => {
-  if (!publicClient || publicClient.chain !== chain) {
+  if (!publicClient || publicClient.chain?.id !== chain.id) {
     publicClient = await initiatePublicClient(chain);
   }
   return publicClient;

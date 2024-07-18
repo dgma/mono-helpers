@@ -16,6 +16,11 @@
     "fuel": {
       "minDeposit": 30
     },
+    "scroll": {
+      "kelp": {
+        "minDeposit": 70
+      }
+    },
     "report": {
       "mainnet": {
         "params": [
