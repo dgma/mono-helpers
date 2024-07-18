@@ -26,7 +26,7 @@ const refreshAndCall = (index: string, address: `0x${string}`) => async (report:
       total_points,
       NURI_LP_stats,
     };
-    console.log("scroll report", JSON.stringify(report[index], null, 2));
+    console.log(`scroll report for ${index} ${JSON.stringify(report[index], null, 2)}`);
     return report;
   } catch (error) {
     console.log((error as { message: any })?.message);

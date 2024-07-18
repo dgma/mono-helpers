@@ -42,7 +42,7 @@ export async function mainnetReport({ save, params }: { save: boolean; params: s
         } as JsonObj,
       );
 
-      console.log("mainnet report", JSON.stringify(report[profileId], null, 2));
+      console.log(`mainnet report for ${profileId} ${JSON.stringify(report[profileId], null, 2)}`);
     } catch (error) {
       console.log((error as { message: any })?.message);
       report[profileId] = {};
