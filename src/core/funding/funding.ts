@@ -1,4 +1,4 @@
-import { formatEther, parseEther } from "viem";
+import { formatEther, parseEther, zeroAddress } from "viem";
 import * as chains from "viem/chains";
 import { chainLinkAddresses } from "src/constants/chainlink";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
@@ -32,6 +32,13 @@ const localClock = new Clock();
 
 const amountGeZero = ({ amount }: { amount: string }) => amount !== "0";
 
+const defaultConfig = {
+  address: zeroAddress,
+  amount: "0",
+  chain: "ETH-ERC20",
+  fee: "0",
+};
+
 const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => {
   const profiles = await getProfiles();
 
@@ -40,7 +47,7 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
   const ethPrice = await getPrice(
     await getPublicClient(chains.mainnet),
     chainLinkAddresses.ETHUSD[chains.mainnet.id],
-    18,
+    0,
   );
   await loopUntil(
     async () => {
@@ -55,17 +62,13 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
         console.log(`Withdrawal fee is above allowed maximum ${maxFee}`);
         return false;
       }
-      if (evmChainConfig.limits.withdraw.min >= range[1]) {
-        console.log(`Amount to withdraw ${range[1]} is below ${evmChainConfig.limits.withdraw.min}`);
-        return false;
-      }
       if (!evmChainConfig.withdraw) {
         console.log(`Withdraw ETH for network ${chain} is disabled`);
         return false;
       }
       return true;
     },
-    5 * 60 * 1000,
+    10 * 60 * 1000,
   );
   const evmChainConfig = await EVMNetworksConfig(chain);
   const rawConfig = await Promise.all(
@@ -77,22 +80,22 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
       for (let filter of filters) {
         const filterPassed = await filter(publicClient, address);
         if (!filterPassed) {
-          return {
-            address,
-            amount: "0",
-            chain: evmChainConfig.id,
-            fee: "0",
-          };
+          return defaultConfig;
         }
       }
       const usdTargetBalance = String(getRandomArbitrary(range[0], range[1]));
-      const expectedBalance = (10n ** 18n * parseEther(usdTargetBalance)) / ethPrice;
-      return {
-        address,
-        amount: formatEther(expectedBalance - balance),
-        chain: evmChainConfig.id,
-        fee: String(evmChainConfig.fee),
-      };
+      const expectedBalance = parseEther(usdTargetBalance) / ethPrice;
+      const amount = formatEther(expectedBalance - balance);
+      if (parseFloat(amount) > evmChainConfig.limits.withdraw.min) {
+        return {
+          address,
+          amount: formatEther(expectedBalance - balance),
+          chain: evmChainConfig.id,
+          fee: String(evmChainConfig.fee),
+        };
+      }
+      console.log(`Amount to withdraw ${amount} is below ${evmChainConfig.limits.withdraw.min}`);
+      return defaultConfig;
     }),
   );
 

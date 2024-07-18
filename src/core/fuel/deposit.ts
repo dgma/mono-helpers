@@ -1,4 +1,4 @@
-import { zeroAddress, parseEther, formatEther } from "viem";
+import { zeroAddress, parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { chainLinkAddresses } from "src/constants/chainlink";
@@ -28,9 +28,11 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
     account,
   });
   const txHash = await walletClient.writeContract(request);
-  // const txHash: `0x${string}` = "0xasdasd";
-  console.log(`tx send: ${txHash}`);
-  return txHash;
+  const receipt = await walletClient.waitForTransactionReceipt({
+    hash: txHash,
+  });
+  console.log(`tx receipt: ${receipt}`);
+  return receipt;
 };
 
 type PrepareFnParams = {
@@ -54,8 +56,7 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
 
   const toDeposit = balance - params.expenses;
 
-  const isEligible =
-    userBalanceInFuel === 0n && toDeposit > 0n && params.ethPrice * toDeposit >= params.minDeposit * 10n ** 18n;
+  const isEligible = userBalanceInFuel === 0n && toDeposit > 0n && params.ethPrice * toDeposit >= params.minDeposit;
 
   return {
     wallet,
@@ -97,7 +98,7 @@ const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: 
   const ethPrice = await getPrice(
     await getPublicClient(chains.mainnet),
     chainLinkAddresses.ETHUSD[chains.mainnet.id],
-    18,
+    0,
   );
   const eligibleAccounts = await Promise.all(
     decodedEVMAccounts.map(prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
@@ -112,16 +113,10 @@ export async function initDeposits(minDeposit: number) {
     ...(wallets.evm as EVMWallet),
   }));
 
-  const report: { [prop: string]: { deposited: string; txHash?: `0x${string}` } } = {};
-
   let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
 
   while (accountToDeposit !== undefined) {
-    const txHash = await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
-    report[accountToDeposit.wallet.address] = {
-      deposited: formatEther(accountToDeposit.toDeposit),
-      txHash,
-    };
+    await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
     localClock.markTime();
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
     await localClock.sleepMax(getRandomArbitrary(3 * 3600000, 5 * 3600000));
