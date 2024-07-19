@@ -47,6 +47,8 @@ fuel :; npx tsx src/cli/fuel.ts
 
 scroll-kelp :; npx tsx src/cli/scroll.kelp.ts
 
+scroll-canvas :; npx tsx src/cli/scroll.canvas.ts
+
 report :; npx tsx src/cli/report.ts
 
 profiles :; npx tsx src/cli/profiles.ts

@@ -30,7 +30,7 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  console.log(`tx receipt: ${receipt}`);
+  console.log(`tx hash: ${receipt.transactionHash}`);
   return receipt;
 };
 

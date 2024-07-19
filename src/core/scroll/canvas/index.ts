@@ -1,0 +1,1 @@
+export { initiateMinting } from "./canvas";

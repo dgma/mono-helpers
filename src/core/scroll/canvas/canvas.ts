@@ -15,7 +15,7 @@ import { EVMWallet } from "src/types/configs";
 const chain = chains.scroll;
 const localClock = new Clock();
 const mintCost = parseEther("0.001");
-const testUserName = hash("superUniqRandomUserName123456789!@£$");
+const testUserName = hash("superUniqRandom", 15);
 
 const isUsernameUsed = async (userName: string) =>
   (await getPublicClient(chain)).readContract({
@@ -26,7 +26,8 @@ const isUsernameUsed = async (userName: string) =>
   });
 
 const gerAvailableNickName = async (axiosInstance: AxiosInstance) => {
-  const name = await getName(axiosInstance);
+  const rawName = await getName(axiosInstance);
+  const name = rawName.length > 12 ? rawName.substring(0, 12) : rawName;
   let number = getRandomArbitrary(12, 1000);
   while (isUsernameUsed(`${name}_${number}`)) {
     number = getRandomArbitrary(12, 1000);
@@ -43,7 +44,7 @@ const mint = async (wallet: EVMWallet) => {
     address: CANVAS_ADDRESS,
     abi: CANVAS_ABI,
     functionName: "deposit",
-    args: [name, 0x0],
+    args: [name, ""],
     value: mintCost,
     account,
   });
@@ -51,18 +52,26 @@ const mint = async (wallet: EVMWallet) => {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  console.log(`name: tx receipt: ${receipt}`);
+  console.log(`name: ${name}, tx hash: ${receipt.transactionHash}`);
   return receipt;
 };
 
 const prepare = (expenses: bigint) => async (wallet: EVMWallet) => {
   const publicClient = await getPublicClient(chain);
+  const profile = await publicClient.readContract({
+    address: CANVAS_ADDRESS,
+    abi: CANVAS_ABI,
+    functionName: "getProfile",
+    args: [wallet.address],
+  });
   const isProfileMinted = await publicClient.readContract({
     address: CANVAS_ADDRESS,
     abi: CANVAS_ABI,
     functionName: "isProfileMinted",
-    args: [wallet.address],
+    args: [profile],
   });
+
+  console.log("isProfileMinted", isProfileMinted);
 
   const balance = await publicClient.getBalance({
     address: wallet.address,
@@ -83,7 +92,7 @@ const getExpenses = async () => {
     address: CANVAS_ADDRESS,
     abi: CANVAS_ABI,
     functionName: "mint",
-    args: [testUserName, 0x0],
+    args: [testUserName, ""],
     value: mintCost,
   });
   return mintGasCost * gasPrice + mintCost;
@@ -99,7 +108,7 @@ const filterNotEligible = (
 const getAccountToMint = async (wallets: EVMWallet[]) => {
   const expenses = await getExpenses();
   const eligibleAccounts = await Promise.all(wallets.map(prepare(expenses))).then(filterNotEligible);
-  console.log("mint canvas nft fot ", eligibleAccounts.length);
+  console.log("mint canvas nft for ", eligibleAccounts.length);
   return eligibleAccounts[0];
 };
 
