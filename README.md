@@ -22,6 +22,49 @@ All available commands: `make list`
 
 ## Installation
 
+1. Create a master_key and keep it secret outside of the app.
+
+2. Install dependencies
+
+```sh
+make
+```
+
+3. Create .sercretsrc file:
+
+```json
+{
+  "proxy": {
+    "userᵻ": "xxxxxx",
+    "passᵻ": "xxxxxx",
+    "hostᵻ": "xxxxx",
+    "portᵻ": "xxxxxx",
+    "reboot-linkᵻ": "xxxxxx"
+  },
+  "rpc": {
+    "alchemy": {
+      "keyᵻ": "xxxxxxx"
+    }
+  },
+  "okx": {
+    "keyᵻ": "xxxxxxx",
+    "secretᵻ": "xxxxxx",
+    "passwordᵻ": "xxxxxxx"
+  },
+  "randommer": {
+    "keyᵻ": "xxxxxxx"
+  }
+}
+```
+
+4. Encrypt dependencies
+
+```sh
+make encrypt-secrets
+```
+
+5. Generate or restore profiles with [Profile generator](docs/profile.md)
+
 ```sh
 make profile
 ```

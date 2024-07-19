@@ -7,6 +7,8 @@ export type NetworkWallet = {
   pkᵻ: string;
 };
 
+export type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
+
 export type Wallet = {
   [key in Networks]: NetworkWallet;
 };
@@ -40,6 +42,9 @@ export type AppConfig = {
     keyᵻ: string;
     secretᵻ: string;
     passwordᵻ: string;
+  };
+  randommer: {
+    keyᵻ: string;
   };
   cli: {
     funding: {

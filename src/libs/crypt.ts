@@ -3,7 +3,8 @@ import { JsonValue } from "src/types/common";
 
 export const marker = "ᵻ" as const;
 
-const hash = (value: string, size = 32) => crypto.createHash("sha256").update(value).digest("hex").slice(0, size);
+export const hash = (value: string, size = 32) =>
+  crypto.createHash("sha256").update(value).digest("hex").slice(0, size);
 
 function getPrerequisites(masterKey: string) {
   const key = hash(masterKey);

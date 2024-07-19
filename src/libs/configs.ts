@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { decryptJson } from "./crypt";
 import { getMasterKey } from "./shared";
 import { JsonObj } from "src/types/common";
-import { AppConfig, Profile } from "src/types/configs";
+import { AppConfig, Profile, EVMWallet } from "src/types/configs";
 
 let config: AppConfig;
 
@@ -11,8 +11,8 @@ export const getAppConf = async () => {
   if (!config) {
     const masterKey = await getMasterKey();
     config = {
-      ...(decryptJson(readFileSync(resolve(".", ".app.secrets"), "utf-8").trimEnd(), masterKey) as JsonObj),
-      ...(JSON.parse(readFileSync(resolve(".", "app.config.json"), "utf-8").trimEnd()) as JsonObj),
+      ...(decryptJson(readFileSync(resolve(".", ".secrets"), "utf-8").trimEnd(), masterKey) as JsonObj),
+      ...(JSON.parse(readFileSync(resolve(".", ".apprc"), "utf-8").trimEnd()) as JsonObj),
     } as AppConfig;
   }
   return config;
@@ -27,3 +27,8 @@ export const getProfiles = async () => {
   }
   return profiles;
 };
+
+export const getEVMWallets = async () =>
+  Object.values(await getProfiles()).map(({ wallets }) => ({
+    ...(wallets.evm as EVMWallet),
+  }));

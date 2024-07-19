@@ -9,8 +9,7 @@ import Clock from "src/libs/clock";
 import { getProfiles } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
 import { getRandomArbitrary, loopUntil } from "src/libs/shared";
-
-type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
+import { EVMWallet } from "src/types/configs";
 
 const chain = chains.scroll;
 const localClock = new Clock();
