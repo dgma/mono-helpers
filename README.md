@@ -53,7 +53,10 @@ make
   },
   "randommer": {
     "keyᵻ": "xxxxxxx"
-  }
+  },
+  "qnode": {
+    "keyᵻ": "xxxxxxx"
+  };
 }
 ```
 

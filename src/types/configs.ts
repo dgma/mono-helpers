@@ -37,6 +37,9 @@ export type AppConfig = {
     alchemy: {
       keyᵻ: string;
     };
+    qnode: {
+      keyᵻ: string;
+    };
   };
   okx: {
     keyᵻ: string;

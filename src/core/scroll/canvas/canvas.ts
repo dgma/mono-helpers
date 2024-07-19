@@ -108,8 +108,7 @@ const filterNotEligible = (
 
 const getAccountToMint = async (wallets: EVMWallet[]) => {
   const expenses = await getExpenses();
-  const z = [wallets[0]];
-  const eligibleAccounts = await Promise.all(z.map(prepare(expenses))).then(filterNotEligible);
+  const eligibleAccounts = await Promise.all(wallets.map(prepare(expenses))).then(filterNotEligible);
   logger.info(`mint canvas nft for ${eligibleAccounts.length}`, { label: "canvas" });
   return eligibleAccounts[0];
 };
