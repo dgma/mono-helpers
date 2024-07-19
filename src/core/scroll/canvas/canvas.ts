@@ -44,7 +44,7 @@ const mint = async (wallet: EVMWallet) => {
   const { request } = await walletClient.simulateContract({
     address: CANVAS_ADDRESS,
     abi: CANVAS_ABI,
-    functionName: "deposit",
+    functionName: "mint",
     args: [name, ""],
     value: mintCost,
     account,

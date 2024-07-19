@@ -43,12 +43,13 @@ type PrepareFnParams = {
 
 const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
   const publicClient = await getPublicClient(chain);
-  const userBalanceInKelp = await publicClient.readContract({
+  const userBalanceInKelp = (await publicClient.readContract({
     address: KELP_POOL_SCROLL_ADDRESS,
     abi: KELP_POOL_SCROLL_ABI,
     functionName: "balanceOf",
     args: [wallet.address],
-  });
+    account: wallet.address,
+  })) as bigint;
 
   const balance = await publicClient.getBalance({
     address: wallet.address,
@@ -56,7 +57,10 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
 
   const toDeposit = balance - params.expenses;
 
-  const isEligible = userBalanceInKelp === 0n && toDeposit > 0n && params.ethPrice * toDeposit >= params.minDeposit;
+  const isEligible =
+    userBalanceInKelp * params.ethPrice <= params.minDeposit &&
+    toDeposit > 0n &&
+    params.ethPrice * toDeposit >= params.minDeposit;
 
   return {
     wallet,
