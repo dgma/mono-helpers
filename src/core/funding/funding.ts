@@ -7,7 +7,7 @@ import { getPublicClient } from "src/libs/clients";
 import Clock from "src/libs/clock";
 import { getProfiles } from "src/libs/configs";
 import { withdrawETH, consolidateETH, EVMNetworksConfig } from "src/libs/okx";
-import { getRandomArbitrary, loopUntil } from "src/libs/shared";
+import { getRandomArbitrary, loopUntil, sleep } from "src/libs/shared";
 import { logger } from "src/logger";
 import { FundingFilter } from "src/types/funding";
 import { WithdrawChain } from "src/types/okx";
@@ -119,6 +119,8 @@ export const initFunding = async (params: Params) => {
     const receipt = await withdrawETH(config);
     report.push(receipt);
     await localClock.markTime();
+    // need to wait withdrawal
+    await sleep(10 * 60_000);
     config = await getEligibleFunding(params);
     await localClock.sleepMax(getRandomArbitrary(4 * 3600000, 8 * 3600000));
   }

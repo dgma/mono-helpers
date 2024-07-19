@@ -23,6 +23,7 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
     address: KELP_POOL_SCROLL_ADDRESS,
     abi: KELP_POOL_SCROLL_ABI,
     functionName: "deposit",
+    args: ["0xd05723c7b17b4e4c722ca4fb95e64ffc54a70131c75e2b2548a456c51ed7cdaf"],
     value: toDeposit,
     account,
   });

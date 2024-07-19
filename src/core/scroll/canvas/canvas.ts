@@ -30,7 +30,7 @@ const gerAvailableNickName = async (axiosInstance: AxiosInstance) => {
   const rawName = await getName(axiosInstance);
   const name = rawName.length > 12 ? rawName.substring(0, 12) : rawName;
   let number = getRandomArbitrary(12, 1000);
-  while (isUsernameUsed(`${name}_${number}`)) {
+  while (await isUsernameUsed(`${name}_${number}`)) {
     number = getRandomArbitrary(12, 1000);
   }
   return `${name}_${number}`;
@@ -72,7 +72,7 @@ const prepare = (expenses: bigint) => async (wallet: EVMWallet) => {
     args: [profile],
   });
 
-  logger.info(`isProfileMinted: ${isProfileMinted}`, { label: "canvas" });
+  logger.debug(`isProfileMinted: ${isProfileMinted}`, { label: "canvas" });
 
   const balance = await publicClient.getBalance({
     address: wallet.address,
