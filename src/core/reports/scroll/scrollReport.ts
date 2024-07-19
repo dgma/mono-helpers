@@ -1,5 +1,6 @@
 import axiosRetry from "axios-retry";
 import { scroll } from "viem/chains";
+import { isProfileMinted } from "./canvas";
 import { getLpStats } from "./nuri";
 import { accountPoints } from "./points";
 import { getProfiles } from "src/libs/configs";
@@ -25,6 +26,7 @@ const refreshAndCall = (index: string, address: `0x${string}`) => async (report:
       portfolio,
       total_points,
       NURI_LP_stats,
+      isProfileMinted: await isProfileMinted(address),
     };
     console.log(`scroll report for ${index} ${JSON.stringify(report[index], null, 2)}`);
     return report;
