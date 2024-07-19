@@ -119,6 +119,6 @@ export async function initFuelDeposits(minDeposit: number) {
     await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
     localClock.markTime();
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
-    await localClock.sleepMax(getRandomArbitrary(3 * 3600000, 5 * 3600000));
+    await localClock.sleepMax(getRandomArbitrary(1 * 3600000, 2 * 3600000));
   }
 }

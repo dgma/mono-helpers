@@ -122,6 +122,6 @@ export async function initiateMinting() {
     await mint(accountToMint.wallet);
     localClock.markTime();
     accountToMint = await getAccountToMint(wallets);
-    await localClock.sleepMax(getRandomArbitrary(3 * 3600000, 5 * 3600000));
+    await localClock.sleepMax(getRandomArbitrary(1 * 3600000, 2 * 3600000));
   }
 }
