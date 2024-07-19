@@ -11,7 +11,7 @@ export const getAppConf = async () => {
   if (!config) {
     const masterKey = await getMasterKey();
     config = {
-      ...(decryptJson(readFileSync(resolve(".", ".secretsrc"), "utf-8").trimEnd(), masterKey) as JsonObj),
+      ...(decryptJson(readFileSync(resolve(".", ".secrets"), "utf-8").trimEnd(), masterKey) as JsonObj),
       ...(JSON.parse(readFileSync(resolve(".", ".apprc"), "utf-8").trimEnd()) as JsonObj),
     } as AppConfig;
   }

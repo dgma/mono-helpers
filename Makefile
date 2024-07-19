@@ -19,15 +19,21 @@ lint-stg :; npx lint-staged
 test :; npx jest --passWithNoTests
 
 pre-commit: typecheck lint-stg
+
 pre-push : lint typecheck test
 
-migrate :; npx tsx src/migrations/$(script).ts
+# setup
+
+encrypt-secrets :; export FILE=.secretsrc && export OUTPUT=.secrets && npx tsx src/cli/encrypt.ts && unset FILE && unset OUTPUT && rm -rf .secretsrc
+
+# docker aliases
 
 service?=fuel
 
 up :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose up -d $(service) && unset REPLY && docker compose logs -f $(service); rm -rf master_key
 
 up-all :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose up -d && unset REPLY && docker compose logs -f; rm -rf master_key
+
 # cli
 list :; npx tsx src/cli/list.ts
 

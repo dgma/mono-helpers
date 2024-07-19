@@ -20,3 +20,6 @@ npm-debug.log*
 reports/
 !src/**/*
 master_key
+.apprc
+.secretsrc
+.secrets
