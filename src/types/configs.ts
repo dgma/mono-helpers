@@ -7,6 +7,8 @@ export type NetworkWallet = {
   pkᵻ: string;
 };
 
+export type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
+
 export type Wallet = {
   [key in Networks]: NetworkWallet;
 };
