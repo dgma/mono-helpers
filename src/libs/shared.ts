@@ -12,7 +12,7 @@ export const getRandomArbitrary = (min: number, max: number) => {
   if (max <= min) {
     throw new Error("max should be above min");
   }
-  return Math.random() * (max - min) + min;
+  return Math.round(Math.random() * (max - min) + min);
 };
 
 export const saveInFolder = (savePath: string, data: string) => {

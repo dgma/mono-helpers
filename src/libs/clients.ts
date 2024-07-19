@@ -16,7 +16,8 @@ const getRpcUrl = async (chain: chains.Chain) => {
   const conf = await getAppConf();
   switch (chain.id) {
     case chains.scroll.id:
-      return chains.scroll.rpcUrls.default.http[0];
+      // return chains.scroll.rpcUrls.default.http[0];
+      return "https://scroll.drpc.org";
     default:
       return `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`;
   }
