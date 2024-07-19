@@ -14,6 +14,7 @@ import { EVMWallet } from "src/types/configs";
 
 const chain = chains.scroll;
 const localClock = new Clock();
+const minLeft = parseEther(String(getRandomArbitrary(3, 20) / 1000));
 
 const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const axiosInstance = await refreshProxy();
@@ -80,7 +81,7 @@ const getExpenses = async (account: `0x${string}`) => {
     value: 10n,
   });
 
-  return depositCost * 10n * (await publicClient.getGasPrice());
+  return depositCost * 10n * (await publicClient.getGasPrice()) + minLeft;
 };
 
 const getAccountToDeposit = async (wallets: EVMWallet[], minDeposit: number) => {
