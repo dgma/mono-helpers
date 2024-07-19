@@ -43,6 +43,9 @@ export type AppConfig = {
     secretᵻ: string;
     passwordᵻ: string;
   };
+  randommer: {
+    keyᵻ: string;
+  };
   cli: {
     funding: {
       chain: keyof typeof OKX_WITHDRAW_CHAINS;

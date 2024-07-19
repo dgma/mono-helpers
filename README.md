@@ -50,6 +50,9 @@ make
     "keyᵻ": "xxxxxxx",
     "secretᵻ": "xxxxxx",
     "passwordᵻ": "xxxxxxx"
+  },
+  "randommer": {
+    "keyᵻ": "xxxxxxx"
   }
 }
 ```
