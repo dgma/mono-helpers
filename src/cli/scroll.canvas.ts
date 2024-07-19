@@ -1,7 +1,8 @@
 import { initiateMinting } from "src/core/scroll/canvas";
+import { logger } from "src/logger";
 
 (async function main() {
-  console.log("scroll canvas script initiated");
+  logger.info("initiated", { label: "CLI::canvas" });
   await initiateMinting();
-  console.log("scroll canvas script finished");
+  logger.info("finished", { label: "CLI::canvas" });
 })();

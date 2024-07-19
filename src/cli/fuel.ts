@@ -1,9 +1,10 @@
 import { initFuelDeposits } from "src/core/fuel";
 import { getAppConf } from "src/libs/configs";
+import { logger } from "src/logger";
 
 (async function main() {
-  console.log("fuel script initiated");
+  logger.info("initiated", { label: "CLI::fuel" });
   const conf = await getAppConf();
   await initFuelDeposits(conf.cli.fuel.minDeposit);
-  console.log("fuel script finished");
+  logger.info("finished", { label: "CLI::encrypt" });
 })();

@@ -8,6 +8,7 @@ import Clock from "src/libs/clock";
 import { getProfiles } from "src/libs/configs";
 import { withdrawETH, consolidateETH, EVMNetworksConfig } from "src/libs/okx";
 import { getRandomArbitrary, loopUntil } from "src/libs/shared";
+import { logger } from "src/logger";
 import { FundingFilter } from "src/types/funding";
 import { WithdrawChain } from "src/types/okx";
 
@@ -59,11 +60,11 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
       );
       const maxFeeConverted = parseFloat(formatEther(parseEther(String(maxFee)) / ethPrice));
       if (maxFeeConverted <= evmChainConfig.fee) {
-        console.log(`Withdrawal fee is above allowed maximum ${maxFee}`);
+        logger.info(`Withdrawal fee is above allowed maximum ${maxFee}`, { label: "funding" });
         return false;
       }
       if (!evmChainConfig.withdraw) {
-        console.log(`Withdraw ETH for network ${chain} is disabled`);
+        logger.info(`Withdraw ETH for network ${chain} is disabled`, { label: "funding" });
         return false;
       }
       return true;
@@ -94,14 +95,18 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
           fee: String(evmChainConfig.fee),
         };
       }
-      console.log(`Amount to withdraw ${amount} is below ${evmChainConfig.limits.withdraw.min}`);
+      logger.debug(`Amount to withdraw ${amount} is below ${evmChainConfig.limits.withdraw.min}`, { label: "funding" });
       return defaultConfig;
     }),
   );
 
-  console.log("accounts to fund", rawConfig.filter(amountGeZero).length);
+  const filteredConfigs = rawConfig.filter(amountGeZero);
 
-  return rawConfig.find(amountGeZero);
+  logger.info(`accounts to fund ${filteredConfigs.length}`, {
+    label: "funding",
+  });
+
+  return filteredConfigs[0];
 };
 
 export const initFunding = async (params: Params) => {

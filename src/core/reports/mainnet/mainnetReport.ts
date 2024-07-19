@@ -5,6 +5,7 @@ import { getProfiles } from "src/libs/configs";
 import { getFormattedPortfolio } from "src/libs/portfolio";
 import { refreshProxy } from "src/libs/proxify";
 import { saveInFolder, getRandomArbitrary } from "src/libs/shared";
+import { logger } from "src/logger";
 import { JsonObj } from "src/types/common";
 
 export async function mainnetReport({ save, params }: { save: boolean; params: string[] }) {
@@ -42,9 +43,11 @@ export async function mainnetReport({ save, params }: { save: boolean; params: s
         } as JsonObj,
       );
 
-      console.log(`mainnet report for ${profileId} ${JSON.stringify(report[profileId], null, 2)}`);
+      logger.log(`${profileId} ${JSON.stringify(report[profileId], null, 2)}`, {
+        label: "mainnetReport",
+      });
     } catch (error) {
-      console.log((error as { message: any })?.message);
+      logger.error((error as { message: any })?.message, { label: "mainnetReport" });
       report[profileId] = {};
     }
   }

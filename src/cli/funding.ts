@@ -2,10 +2,11 @@ import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 import { initFunding } from "src/core/funding";
 import { noFuel, onlyZero, lteBalance } from "src/core/funding/filters";
 import { getAppConf } from "src/libs/configs";
+import { logger } from "src/logger";
 import { FundingFilter } from "src/types/funding";
 
 (async function main() {
-  console.log("funding script initiated");
+  logger.info("initiated", { label: "CLI::funding" });
   const conf = await getAppConf();
   const fFiltersMap: { noFuel: FundingFilter; onlyZero: FundingFilter; lteBalance: FundingFilter } = {
     noFuel,
@@ -22,5 +23,5 @@ import { FundingFilter } from "src/types/funding";
     chain: OKX_WITHDRAW_CHAINS[chain],
     maxFee: conf.cli.funding.maxFee,
   });
-  console.log("funding script finished");
+  logger.info("finished", { label: "CLI::funding" });
 })();

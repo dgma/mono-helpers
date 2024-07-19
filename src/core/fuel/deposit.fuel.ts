@@ -9,6 +9,7 @@ import Clock from "src/libs/clock";
 import { getProfiles } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
 import { getRandomArbitrary, loopUntil } from "src/libs/shared";
+import { logger } from "src/logger";
 import { EVMWallet } from "src/types/configs";
 
 const chain = chains.mainnet;
@@ -30,7 +31,7 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  console.log(`tx hash: ${receipt.transactionHash}`);
+  logger.info(`tx hash: ${receipt.transactionHash}`, { label: "fuel::deposit" });
   return receipt;
 };
 
@@ -102,7 +103,7 @@ const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: 
   const eligibleAccounts = await Promise.all(
     decodedEVMAccounts.map(prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
   ).then((accounts) => accounts.filter(({ isEligible }) => isEligible));
-  console.log("accounts to deposit", eligibleAccounts.length);
+  logger.info(`accounts to deposit ${eligibleAccounts.length}`, { label: "fuel::deposit" });
   return eligibleAccounts[0];
 };
 

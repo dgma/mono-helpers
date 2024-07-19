@@ -1,6 +1,7 @@
 import { readFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { password } from "@inquirer/prompts";
+import { logger } from "src/logger";
 
 export const sleep = (time: number = 1000) =>
   new Promise((resolve) => {
@@ -43,7 +44,7 @@ export const getMasterKey = async () => {
 export const loopUntil = async (condition: () => Promise<boolean>, pause: number) => {
   let isConditionAchieved = await condition();
   while (!isConditionAchieved) {
-    console.log("loopUntil", pause);
+    logger.info(`loopUntil ${pause}`, { label: "loopUntil" });
     await sleep(pause);
     isConditionAchieved = await condition();
   }

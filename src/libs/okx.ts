@@ -1,5 +1,6 @@
 import { okx } from "ccxt";
 import { getAppConf } from "src/libs/configs";
+import { logger } from "src/logger";
 import { OKXNetwork, WithdrawConfig, WithdrawChain } from "src/types/okx";
 
 let OKX: okx;
@@ -63,6 +64,6 @@ export const withdrawETH = async (config: WithdrawConfig) => {
     chain: config.chain,
     fee: config.fee,
   };
-  console.log("withdraw with params", JSON.stringify(withdrawalParams));
+  logger.info(`withdraw with params ${JSON.stringify(withdrawalParams)}`, { label: "okx" });
   return (await getOKX()).withdraw("ETH", parseFloat(config.amount), config.address, undefined, withdrawalParams);
 };

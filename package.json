@@ -46,12 +46,14 @@
     "ethers": "^6.13.0",
     "hpagent": "^1.2.0",
     "joi": "^17.13.3",
+    "logform": "^2.6.1",
     "micro-key-producer": "^0.7.0",
     "micro-sol-signer": "^0.4.2",
     "tiny-secp256k1": "^2.2.3",
     "tsx": "^4.15.7",
     "typescript": "^5.4.5",
-    "viem": "^2.16.3"
+    "viem": "^2.16.3",
+    "winston": "^3.13.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

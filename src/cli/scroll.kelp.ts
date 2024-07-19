@@ -1,9 +1,10 @@
 import { initKelpDeposits } from "src/core/scroll/kelp";
 import { getAppConf } from "src/libs/configs";
+import { logger } from "src/logger";
 
 (async function main() {
-  console.log("scroll kelp script initiated");
+  logger.info("initiated", { label: "CLI::scroll.kelp" });
   const conf = await getAppConf();
   await initKelpDeposits(conf.cli.scroll.kelp.minDeposit);
-  console.log("scroll fuel script finished");
+  logger.info("finished", { label: "CLI::scroll.kelp" });
 })();

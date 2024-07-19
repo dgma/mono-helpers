@@ -5,11 +5,12 @@ import { refreshProxyAgent } from "./agent";
 import { headers, axiosInstance } from "./sham";
 import Clock from "src/libs/clock";
 import { getAppConf } from "src/libs/configs";
+import { logger } from "src/logger";
 import { WhoamiReport } from "src/types/proxify";
 
 async function logIpInfo(axiosInstance: AxiosInstance) {
   const res = await axiosInstance.get<WhoamiReport>("https://whoami.lagunovsky.com/api");
-  console.log(`ip ${res.data.headers["X-Real-Ip"]}`);
+  logger.info(`ip ${res.data.headers["X-Real-Ip"]}`, { label: "proxify" });
 }
 
 const httpsAgent = new https.Agent({
@@ -30,7 +31,7 @@ export async function refreshProxy(minWait = 10000) {
   });
   const conf = await getAppConf();
   const res = await axios.get(conf.proxy["reboot-linkᵻ"], { timeout: 120000, headers, httpsAgent });
-  console.log(`new ip ${res.data.new_ip}`);
+  logger.info(`new ip ${res.data.new_ip}`, { label: "proxify" });
 
   localClock.markTime();
 

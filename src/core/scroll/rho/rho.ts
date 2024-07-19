@@ -1,5 +1,6 @@
 import * as chains from "viem/chains";
+import { logger } from "src/logger";
 
 const chain = chains.scroll;
 
-console.log(chain.id);
+logger.debug(chain.id);

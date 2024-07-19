@@ -1,4 +1,5 @@
 import { sleep } from "src/libs/shared";
+import { logger } from "src/logger";
 export default class Clock {
   #time = Date.now();
 
@@ -16,7 +17,7 @@ export default class Clock {
 
   async sleepMax(maxSleep: number) {
     const waitTime = maxSleep - this.timePassed();
-    console.log(`wait ${waitTime}`);
+    logger.info(`wait ${waitTime}`, { label: "Clock" });
     await sleep(waitTime);
   }
 }

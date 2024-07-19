@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
 import { resolve } from "node:path";
+import { logger } from "src/logger";
 
-const files = readdirSync(resolve(".", "src", "prompts"));
+const files = readdirSync(resolve(".", "src", "cli"));
 
-console.log(`available prompts:\n  ${files.map((file) => file.split(".")[0]).join("\n  ")}`);
+logger.info(`available prompts:\n  ${files.map((file) => file.split(".")[0]).join("\n  ")}`, { label: "CLI::list" });

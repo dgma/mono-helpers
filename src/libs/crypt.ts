@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { logger } from "src/logger";
 import { JsonValue } from "src/types/common";
 
 export const marker = "ᵻ" as const;
@@ -17,7 +18,7 @@ function getPrerequisites(masterKey: string) {
 
 export function encrypt(data: string, masterKey: string) {
   if (data.endsWith(marker)) {
-    console.warn(`${data} already has encryption marker`);
+    logger.warn(`${data} already has encryption marker`, { label: "crypt" });
   }
 
   const { key, salt } = getPrerequisites(masterKey);
@@ -40,6 +41,7 @@ export function decrypt(data: string, masterKey: string) {
     return decipher.update(data.slice(0, -marker.length), "hex", "utf8") + decipher.final("utf8");
   } catch (e) {
     if ((e as any).code === "ERR_OSSL_BAD_DECRYPT") {
+      logger.error("ERR_OSSL_BAD_DECRYPT", { label: "crypt" });
       return null;
     } else {
       throw e;

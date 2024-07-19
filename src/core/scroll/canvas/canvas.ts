@@ -10,6 +10,7 @@ import { hash } from "src/libs/crypt";
 import { refreshProxy } from "src/libs/proxify";
 import { getName } from "src/libs/randommer";
 import { getRandomArbitrary } from "src/libs/shared";
+import { logger } from "src/logger";
 import { EVMWallet } from "src/types/configs";
 
 const chain = chains.scroll;
@@ -52,7 +53,7 @@ const mint = async (wallet: EVMWallet) => {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  console.log(`name: ${name}, tx hash: ${receipt.transactionHash}`);
+  logger.info(`name: ${name}, tx hash: ${receipt.transactionHash}`, { label: "canvas" });
   return receipt;
 };
 
@@ -71,7 +72,7 @@ const prepare = (expenses: bigint) => async (wallet: EVMWallet) => {
     args: [profile],
   });
 
-  console.log("isProfileMinted", isProfileMinted);
+  logger.info(`isProfileMinted: ${isProfileMinted}`, { label: "canvas" });
 
   const balance = await publicClient.getBalance({
     address: wallet.address,
@@ -108,7 +109,7 @@ const filterNotEligible = (
 const getAccountToMint = async (wallets: EVMWallet[]) => {
   const expenses = await getExpenses();
   const eligibleAccounts = await Promise.all(wallets.map(prepare(expenses))).then(filterNotEligible);
-  console.log("mint canvas nft for ", eligibleAccounts.length);
+  logger.info(`mint canvas nft for ${eligibleAccounts.length}`, { label: "canvas" });
   return eligibleAccounts[0];
 };
 
