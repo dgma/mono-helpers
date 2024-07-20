@@ -9,7 +9,7 @@ import { getEVMWallets } from "src/libs/configs";
 import { hash } from "src/libs/crypt";
 import { refreshProxy } from "src/libs/proxify";
 import { getName } from "src/libs/randommer";
-import { getRandomArbitrary } from "src/libs/shared";
+import { getRandomArbitrary, sleep } from "src/libs/shared";
 import { logger } from "src/logger";
 import { EVMWallet } from "src/types/configs";
 
@@ -99,16 +99,22 @@ const getExpenses = async () => {
   return mintGasCost * gasPrice + mintCost;
 };
 
-const filterNotEligible = (
-  accounts: {
-    wallet: EVMWallet;
-    isEligible: boolean;
-  }[],
-) => accounts.filter(({ isEligible }) => isEligible);
-
 const getAccountToMint = async (wallets: EVMWallet[]) => {
   const expenses = await getExpenses();
-  const eligibleAccounts = await Promise.all(wallets.map(prepare(expenses))).then(filterNotEligible);
+  const makeConfig = prepare(expenses);
+  const eligibleAccounts: {
+    wallet: EVMWallet;
+    isEligible: boolean;
+  }[] = [];
+  wallets.reduce(async (promise, wallet) => {
+    await promise;
+    await sleep(2000);
+    const config = await makeConfig(wallet);
+    if (config.isEligible) {
+      eligibleAccounts.push(config);
+    }
+    return;
+  }, Promise.resolve());
   logger.info(`mint canvas nft for ${eligibleAccounts.length}`, { label: "canvas" });
   return eligibleAccounts[0];
 };

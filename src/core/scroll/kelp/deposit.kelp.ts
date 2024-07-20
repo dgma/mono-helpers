@@ -6,9 +6,9 @@ import { KELP_POOL_SCROLL_ADDRESS, KELP_POOL_SCROLL_ABI } from "src/constants/ke
 import { getPrice } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
 import Clock from "src/libs/clock";
-import { getProfiles } from "src/libs/configs";
+import { getEVMWallets } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
-import { getRandomArbitrary, loopUntil } from "src/libs/shared";
+import { getRandomArbitrary, loopUntil, sleep } from "src/libs/shared";
 import { logger } from "src/logger";
 import { EVMWallet } from "src/types/configs";
 
@@ -98,25 +98,34 @@ const getAccountToDeposit = async (wallets: EVMWallet[], minDeposit: number) => 
     chainLinkAddresses.ETHUSD[chains.mainnet.id],
     0,
   );
-  const eligibleAccounts = await Promise.all(
-    wallets.map(prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
-  ).then((accounts) => accounts.filter(({ isEligible }) => isEligible));
+  const makeConfig = prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) });
+  const eligibleAccounts: {
+    wallet: EVMWallet;
+    isEligible: boolean;
+    toDeposit: bigint;
+  }[] = [];
+  wallets.reduce(async (promise, wallet) => {
+    await promise;
+    await sleep(2000);
+    const config = await makeConfig(wallet);
+    if (config.isEligible) {
+      eligibleAccounts.push(config);
+    }
+    return;
+  }, Promise.resolve());
   logger.info(`accounts to deposit ${eligibleAccounts.length}`, { label: "deposit.kelp" });
   return eligibleAccounts[0];
 };
 
 export async function initKelpDeposits(minDeposit: number) {
-  const profiles = await getProfiles();
-  const decodedEVMAccounts = Object.values(profiles).map(({ wallets }) => ({
-    ...(wallets.evm as EVMWallet),
-  }));
+  const wallets = await getEVMWallets();
 
-  let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
+  let accountToDeposit = await getAccountToDeposit(wallets, minDeposit);
 
   while (accountToDeposit !== undefined) {
     await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
     localClock.markTime();
-    accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
+    accountToDeposit = await getAccountToDeposit(wallets, minDeposit);
     await localClock.sleepMax(getRandomArbitrary(1 * 3600000, 2 * 3600000));
   }
 }
