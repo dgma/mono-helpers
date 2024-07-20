@@ -37,27 +37,34 @@ const gerAvailableNickName = async (axiosInstance: AxiosInstance) => {
 };
 
 const mint = async (wallet: EVMWallet) => {
-  const axiosInstance = await refreshProxy();
-  const walletClient = await getClient(chain, axiosInstance);
-  const account = privateKeyToAccount(wallet.pkᵻ);
-  const name = await gerAvailableNickName(axiosInstance);
-  const { request } = await walletClient.simulateContract({
-    address: CANVAS_ADDRESS,
-    abi: CANVAS_ABI,
-    functionName: "mint",
-    args: [name, ""],
-    value: mintCost,
-    account,
-  });
-  const txHash = await walletClient.writeContract(request);
-  const receipt = await walletClient.waitForTransactionReceipt({
-    hash: txHash,
-  });
-  logger.info(`name: ${name}, tx hash: ${receipt.transactionHash}`, { label: "canvas" });
-  return receipt;
+  try {
+    const axiosInstance = await refreshProxy(0);
+    const walletClient = await getClient(chain, axiosInstance);
+    const account = privateKeyToAccount(wallet.pkᵻ);
+    console.info(`mint for ${account.address}`, { label: "canvas" });
+    const name = await gerAvailableNickName(axiosInstance);
+    const { request } = await walletClient.simulateContract({
+      address: CANVAS_ADDRESS,
+      abi: CANVAS_ABI,
+      functionName: "mint",
+      args: [name, ""],
+      value: mintCost,
+      account,
+      chain,
+    });
+    const txHash = await walletClient.writeContract(request);
+    const receipt = await walletClient.waitForTransactionReceipt({
+      hash: txHash,
+    });
+    logger.info(`name: ${name}, tx hash: ${receipt.transactionHash}`, { label: "canvas" });
+    return receipt;
+  } catch (error) {
+    logger.error((error as Error).message, { label: "canvas" });
+  }
 };
 
 const prepare = (expenses: bigint) => async (wallet: EVMWallet) => {
+  logger.debug(`prepare: ${wallet.address}`, { label: "canvas" });
   const publicClient = await getPublicClient(chain);
   const profile = await publicClient.readContract({
     address: CANVAS_ADDRESS,
@@ -80,6 +87,8 @@ const prepare = (expenses: bigint) => async (wallet: EVMWallet) => {
 
   const isEligible = !isProfileMinted && balance > expenses;
 
+  logger.debug(`isEligible: ${isEligible}`, { label: "canvas" });
+
   return {
     wallet,
     isEligible,
@@ -99,35 +108,34 @@ const getExpenses = async () => {
   return mintGasCost * gasPrice + mintCost;
 };
 
-const getAccountToMint = async (wallets: EVMWallet[]) => {
+type ProcessedWallets = { [prop: `0x${string}`]: true };
+
+const getAccountToMint = async (wallets: EVMWallet[], processedWallets: ProcessedWallets) => {
   const expenses = await getExpenses();
   const makeConfig = prepare(expenses);
-  const eligibleAccounts: {
-    wallet: EVMWallet;
-    isEligible: boolean;
-  }[] = [];
-  await wallets.reduce(async (promise, wallet) => {
-    await promise;
-    await sleep(1500);
-    const config = await makeConfig(wallet);
-    if (config.isEligible) {
-      eligibleAccounts.push(config);
+  for (const wallet of wallets) {
+    if (!processedWallets[wallet.address]) {
+      await sleep(1500);
+      const config = await makeConfig(wallet);
+      if (config.isEligible) {
+        return config;
+      } else {
+        processedWallets[wallet.address] = true;
+      }
     }
-    return;
-  }, Promise.resolve());
-  logger.info(`mint canvas nft for ${eligibleAccounts.length}`, { label: "canvas" });
-  return eligibleAccounts[0];
+  }
 };
 
 export async function initiateMinting() {
-  const wallets = await getEVMWallets();
+  const wallets = (await getEVMWallets()).reverse();
+  const processedWallets: ProcessedWallets = {};
 
-  let accountToMint = await getAccountToMint(wallets);
+  let accountToMint = await getAccountToMint(wallets, processedWallets);
 
   while (accountToMint !== undefined) {
     await mint(accountToMint.wallet);
     localClock.markTime();
-    accountToMint = await getAccountToMint(wallets);
-    await localClock.sleepMax(getRandomArbitrary(1 * 3600000, 2 * 3600000));
+    accountToMint = await getAccountToMint(wallets, processedWallets);
+    await localClock.sleepMax(getRandomArbitrary(600000, 2 * 600000));
   }
 }

@@ -55,4 +55,6 @@ profiles :; npx tsx src/cli/profiles.ts
 
 recover :; npx tsx src/cli/profiles.ts
 
+stest :; npx tsx src/cli/test.ts
+
 -include ${FCT_PLUGIN_PATH}/makefile-external
