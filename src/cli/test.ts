@@ -5,10 +5,9 @@ import { refreshProxy } from "src/libs/proxify";
 import { sleep } from "src/libs/shared";
 import { logger } from "src/logger";
 
-const wallets = await getEVMWallets();
-
 (async function mainnet() {
   const axiosInstance = await refreshProxy(0);
+  const wallets = await getEVMWallets();
   const client = await getClient(scroll, axiosInstance);
   await wallets.reduce(async (promise, wallet) => {
     await promise;
