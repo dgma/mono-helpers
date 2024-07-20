@@ -106,9 +106,9 @@ const getAccountToMint = async (wallets: EVMWallet[]) => {
     wallet: EVMWallet;
     isEligible: boolean;
   }[] = [];
-  wallets.reduce(async (promise, wallet) => {
+  await wallets.reduce(async (promise, wallet) => {
     await promise;
-    await sleep(2000);
+    await sleep(1500);
     const config = await makeConfig(wallet);
     if (config.isEligible) {
       eligibleAccounts.push(config);
