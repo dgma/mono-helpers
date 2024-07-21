@@ -43,7 +43,7 @@ export async function mainnetReport({ save, params }: { save: boolean; params: s
         } as JsonObj,
       );
 
-      logger.log(`${profileId} ${JSON.stringify(report[profileId], null, 2)}`, {
+      logger.info(`${profileId} ${JSON.stringify(report[profileId], null, 2)}`, {
         label: "mainnetReport",
       });
     } catch (error) {
