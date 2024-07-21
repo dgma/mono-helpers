@@ -19,8 +19,8 @@ const getRpcUrl = async (chain: chains.Chain) => {
   switch (chain.id) {
     case chains.scroll.id:
       // return chains.scroll.rpcUrls.default.http[0];
-      return "https://scroll.drpc.org";
-    // return `https://blue-greatest-knowledge.scroll-mainnet.quiknode.pro/${conf.rpc.qnode.keyᵻ}`;
+      // return "https://scroll.drpc.org";
+      return `https://blue-greatest-knowledge.scroll-mainnet.quiknode.pro/${conf.rpc.qnode.keyᵻ}`;
     default:
       return `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`;
   }
