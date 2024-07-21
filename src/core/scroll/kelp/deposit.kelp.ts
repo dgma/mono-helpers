@@ -33,10 +33,10 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
     const receipt = await walletClient.waitForTransactionReceipt({
       hash: txHash,
     });
-    logger.info(`tx hash: ${receipt.transactionHash}`, { label: "deposit.kelp" });
+    logger.info(`tx hash: ${receipt.transactionHash}`, { label: "scroll.deposit.kelp" });
     return receipt;
   } catch (error) {
-    logger.error((error as Error).message, { label: "canvas" });
+    logger.error((error as Error).message, { label: "scroll.deposit.kelp" });
   }
 };
 
@@ -48,6 +48,7 @@ type PrepareFnParams = {
 
 const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
   const publicClient = await getPublicClient(chain);
+  logger.debug(`prepare: ${wallet.address}`, { label: "scroll.deposit.kelp" });
   const userBalanceInKelp = (await publicClient.readContract({
     address: KELP_POOL_SCROLL_ADDRESS,
     abi: KELP_POOL_SCROLL_ABI,
@@ -66,6 +67,8 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
     userBalanceInKelp * params.ethPrice <= params.minDeposit &&
     toDeposit > 0n &&
     params.ethPrice * toDeposit >= params.minDeposit;
+
+  logger.debug(`isEligible: ${isEligible}`, { label: "scroll.deposit.kelp" });
 
   return {
     wallet,
@@ -100,7 +103,7 @@ const getAccountToDeposit = async (wallets: EVMWallet[], processedWallets: Proce
   const makeConfig = prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) });
   for (const wallet of wallets) {
     if (!processedWallets[wallet.address]) {
-      await sleep(1500);
+      await sleep(getRandomArbitrary(2500, 5000));
       const config = await makeConfig(wallet);
       if (config.isEligible) {
         return config;

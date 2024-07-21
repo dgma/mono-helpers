@@ -20,9 +20,6 @@ const getRpcUrl = async (chain: chains.Chain) => {
     case chains.scroll.id:
       // return chains.scroll.rpcUrls.default.http[0];
       return "https://scroll.drpc.org";
-    // return "https://scroll-mainnet.rpc.grove.city/v1/a7a7c8e2";
-    // return "https://1rpc.io/scroll";
-    // return "https://534352.rpc.thirdweb.com";
     // return `https://blue-greatest-knowledge.scroll-mainnet.quiknode.pro/${conf.rpc.qnode.keyᵻ}`;
     default:
       return `https://${chainIdToAlchemyNetworksMap[chain.id]}.g.alchemy.com/v2/${conf.rpc.alchemy.keyᵻ}`;
@@ -38,7 +35,7 @@ async function transport(chain: chains.Chain, proxy?: AxiosInstance) {
   return custom({
     async request(body: { method: string; params: any[] }) {
       if (chain.id === chains.scroll.id) {
-        await sleep(500);
+        await sleep(1500);
       }
 
       logger.debug(`request ${JSON.stringify(body)}`, { label: "Custom_RPC_req" });

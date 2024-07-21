@@ -115,7 +115,7 @@ const getAccountToMint = async (wallets: EVMWallet[], processedWallets: Processe
   const makeConfig = prepare(expenses);
   for (const wallet of wallets) {
     if (!processedWallets[wallet.address]) {
-      await sleep(1500);
+      await sleep(getRandomArbitrary(2500, 5000));
       const config = await makeConfig(wallet);
       if (config.isEligible) {
         return config;
