@@ -51,6 +51,5 @@ make recover
 Decrypt
 
 ```sh
-make decrypt in=.profiles out=.profiles.json
+make decrypt in=clusters/main/.profiles out=clusters/main/.profiles.json
 ```
-

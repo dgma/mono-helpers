@@ -4,8 +4,7 @@ import { genBtc } from "./btc";
 import { genTia, genAtom } from "./cosmos";
 import { genEVM } from "./evm";
 import { genSol } from "./sol";
-import { getProfiles } from "src/libs/configs";
-import { encrypt } from "src/libs/crypt";
+import { getProfilesSafe, saveProfiles } from "src/libs/configs";
 import { Networks, Profile, NetworkWallet } from "src/types/configs";
 
 const networksMap = {
@@ -27,10 +26,9 @@ const genAll = (seed: Buffer, networks: Networks[]) =>
     {} as Record<Networks, NetworkWallet>,
   );
 
-const generateAndSave = async (mnemonics: string[], networks: Networks[], masterKey: string) => {
-  const addProfiles = fs.existsSync(".profiles.json");
-  const profiles = addProfiles ? await getProfiles() : {};
-  const offsetIndex = addProfiles ? Number(Object.keys(profiles).sort((a, b) => Number(b) - Number(a))[0]) + 1 : 0;
+const generateAndSave = async (mnemonics: string[], networks: Networks[]) => {
+  const profiles = await getProfilesSafe();
+  const offsetIndex = profiles.length ? Number(Object.keys(profiles).sort((a, b) => Number(b) - Number(a))[0]) + 1 : 0;
   const data = mnemonics.reduce((acc, mnemonic, i) => {
     const seed = bip39.mnemonicToSeedSync(mnemonic);
     acc[i + offsetIndex] = {
@@ -39,24 +37,15 @@ const generateAndSave = async (mnemonics: string[], networks: Networks[], master
     };
     return acc;
   }, {} as Profile);
-  fs.writeFileSync(
-    ".profiles",
-    encrypt(
-      JSON.stringify({
-        ...profiles,
-        ...data,
-      }),
-      masterKey,
-    ),
-  );
+  saveProfiles({
+    ...profiles,
+    ...data,
+  });
 };
 
-export const createProfiles = (amount: number, networks: Networks[], masterKey: string) =>
-  generateAndSave(
-    Array.from({ length: amount }).map(() => bip39.generateMnemonic()),
-    networks,
-    masterKey,
-  );
+const genMnemonics = (amount: number) => Array.from({ length: amount }).map(() => bip39.generateMnemonic());
 
-export const recoverProfiles = (networks: Networks[], masterKey: string) =>
-  generateAndSave(JSON.parse(fs.readFileSync(".mnemonics.json", "utf-8")) as string[], networks, masterKey);
+export const createProfiles = (amount: number, networks: Networks[]) => generateAndSave(genMnemonics(amount), networks);
+
+export const recoverProfiles = (networks: Networks[]) =>
+  generateAndSave(JSON.parse(fs.readFileSync(".mnemonics.json", "utf-8")) as string[], networks);

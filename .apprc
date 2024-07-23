@@ -1,5 +1,6 @@
 {
   "cli": {
+    "cluster_id": "main",
     "funding": {
       "chain": "eth",
       "filters": [

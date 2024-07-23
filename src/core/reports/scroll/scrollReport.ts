@@ -3,7 +3,7 @@ import { scroll } from "viem/chains";
 import { isProfileMinted } from "./canvas";
 import { getLpStats } from "./nuri";
 import { accountPoints } from "./points";
-import { getProfiles } from "src/libs/configs";
+import { getProfiles, operationFolder } from "src/libs/configs";
 import { getFormattedPortfolio } from "src/libs/portfolio";
 import { refreshProxy } from "src/libs/proxify";
 import { saveInFolder, getRandomArbitrary } from "src/libs/shared";
@@ -45,6 +45,7 @@ export async function scrollReport({ save }: { save: boolean }) {
     Promise.resolve({}),
   );
   if (save) {
-    saveInFolder("./reports/scroll.report.json", JSON.stringify(data, null, 2));
+    const folder = await operationFolder();
+    saveInFolder(`${folder}/reports/scroll.report.json`, JSON.stringify(data, null, 2));
   }
 }

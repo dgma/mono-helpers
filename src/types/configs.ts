@@ -3,20 +3,20 @@ import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 export type Networks = "btc" | "evm" | "sol" | "tia" | "atom";
 
 export type NetworkWallet = {
-  address?: string;
-  pkᵻ: string;
+  readonly address?: string;
+  readonly pkᵻ: string;
 };
 
-export type EVMWallet = { address: `0x${string}`; pkᵻ: `0x${string}` };
+export type EVMWallet = { readonly address: `0x${string}`; readonly pkᵻ: `0x${string}` };
 
 export type Wallet = {
-  [key in Networks]: NetworkWallet;
+  readonly [key in Networks]: NetworkWallet;
 };
 
 export type Profile = {
   [id: string]: {
-    wallets: Wallet;
-    mnemonicᵻ: string;
+    readonly wallets: Wallet;
+    readonly mnemonicᵻ: string;
   };
 };
 
@@ -26,49 +26,50 @@ export type ReportConf = {
 };
 
 export type AppConfig = {
-  proxy: {
-    userᵻ: string;
-    passᵻ: string;
-    hostᵻ: string;
-    portᵻ: string;
-    "reboot-linkᵻ": string;
+  readonly proxy: {
+    readonly userᵻ: string;
+    readonly passᵻ: string;
+    readonly hostᵻ: string;
+    readonly portᵻ: string;
+    readonly "reboot-linkᵻ": string;
   };
-  rpc: {
-    alchemy: {
-      keyᵻ: string;
+  readonly rpc: {
+    readonly alchemy: {
+      readonly keyᵻ: string;
     };
-    qnode: {
-      keyᵻ: string;
+    readonly qnode: {
+      readonly keyᵻ: string;
     };
   };
-  okx: {
-    keyᵻ: string;
-    secretᵻ: string;
-    passwordᵻ: string;
+  readonly okx: {
+    readonly keyᵻ: string;
+    readonly secretᵻ: string;
+    readonly passwordᵻ: string;
   };
-  randommer: {
-    keyᵻ: string;
+  readonly randommer: {
+    readonly keyᵻ: string;
   };
-  cli: {
-    funding: {
-      chain: keyof typeof OKX_WITHDRAW_CHAINS;
-      filters: ("noFuel" | "onlyZero" | "lteBalance")[];
-      depositRange: [number, number];
-      lteBalance?: number;
-      maxFee: number;
+  readonly cli: {
+    readonly cluster_id: string;
+    readonly funding: {
+      readonly chain: keyof typeof OKX_WITHDRAW_CHAINS;
+      readonly filters: ("noFuel" | "onlyZero" | "lteBalance")[];
+      readonly depositRange: [number, number];
+      readonly lteBalance?: number;
+      readonly maxFee: number;
     };
-    fuel: {
-      minDeposit: number;
+    readonly fuel: {
+      readonly minDeposit: number;
     };
-    scroll: {
-      kelp: {
-        minDeposit: number;
+    readonly scroll: {
+      readonly kelp: {
+        readonly minDeposit: number;
       };
     };
-    report: ReportConf;
-    profiles: {
-      amount: number;
-      chains: Networks[];
+    readonly report: ReportConf;
+    readonly profiles: {
+      readonly amount: number;
+      readonly chains: Networks[];
     };
   };
 };

@@ -16,13 +16,11 @@ export const getRandomArbitrary = (min: number, max: number) => {
 };
 
 export const saveInFolder = (savePath: string, data: string) => {
-  const parsedPath = savePath.split("/");
-  const clearPath = parsedPath
-    .slice(0, -1)
-    .filter((folderName) => !!folderName)
-    .join("/");
+  const parsedPath = savePath.split("/").filter((folderName) => !!folderName);
+  const clearPath = parsedPath.slice(0, -1).join("/");
   if (!existsSync(clearPath)) {
-    mkdirSync(clearPath);
+    logger.debug(`clearPath : ${clearPath}`, { label: "saveInFolder" });
+    mkdirSync(clearPath, { recursive: true });
   }
   writeFileSync(savePath, data);
 };

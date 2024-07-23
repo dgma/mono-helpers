@@ -1,7 +1,7 @@
 import axiosRetry from "axios-retry";
 import * as chains from "viem/chains";
 import { getFuelReport } from "./fuel";
-import { getProfiles } from "src/libs/configs";
+import { getProfiles, operationFolder } from "src/libs/configs";
 import { getFormattedPortfolio } from "src/libs/portfolio";
 import { refreshProxy } from "src/libs/proxify";
 import { saveInFolder, getRandomArbitrary } from "src/libs/shared";
@@ -53,6 +53,7 @@ export async function mainnetReport({ save, params }: { save: boolean; params: s
   }
 
   if (save) {
-    saveInFolder("./reports/mainnet.report.json", JSON.stringify(report, null, 2));
+    const folder = await operationFolder();
+    saveInFolder(`${folder}/reports/mainnet.report.json`, JSON.stringify(report, null, 2));
   }
 }
