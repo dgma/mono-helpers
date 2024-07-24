@@ -1,8 +1,9 @@
+import { Hex } from "viem";
 import { scroll } from "viem/chains";
 import { CANVAS_ADDRESS, CANVAS_ABI } from "src/constants/canvas";
 import { getPublicClient } from "src/libs/clients";
 
-export const isProfileMinted = async (address: `0x${string}`) => {
+export const isProfileMinted = async (address: Hex) => {
   const publicClient = await getPublicClient(scroll);
   const profile = await publicClient.readContract({
     address: CANVAS_ADDRESS,

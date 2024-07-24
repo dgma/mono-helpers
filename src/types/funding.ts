@@ -1,3 +1,3 @@
-import { PublicClient } from "viem";
+import { PublicClient, Hex } from "viem";
 
-export type FundingFilter = (client: PublicClient, address: `0x${string}`) => Promise<boolean>;
+export type FundingFilter = (client: PublicClient, address: Hex) => Promise<boolean>;

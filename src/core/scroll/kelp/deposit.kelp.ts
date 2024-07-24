@@ -1,4 +1,4 @@
-import { parseEther } from "viem";
+import { parseEther, Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { chainLinkAddresses } from "src/constants/chainlink";
@@ -77,7 +77,7 @@ const prepare = (params: PrepareFnParams) => async (wallet: EVMWallet) => {
   };
 };
 
-const getExpenses = async (account: `0x${string}`) => {
+const getExpenses = async (account: Hex) => {
   const publicClient = await getPublicClient(chain);
   const depositCost = await publicClient.estimateContractGas({
     account,
@@ -91,7 +91,7 @@ const getExpenses = async (account: `0x${string}`) => {
   return depositCost * 10n * (await publicClient.getGasPrice()) + minLeft;
 };
 
-type ProcessedWallets = { [prop: `0x${string}`]: true };
+type ProcessedWallets = { [prop: Hex]: true };
 
 const getAccountToDeposit = async (wallets: EVMWallet[], processedWallets: ProcessedWallets, minDeposit: number) => {
   const expenses = await getExpenses(wallets[0].address);

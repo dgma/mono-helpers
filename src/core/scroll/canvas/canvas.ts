@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { parseEther } from "viem";
+import { parseEther, Hex } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { CANVAS_ADDRESS, CANVAS_ABI } from "src/constants/canvas";
@@ -108,7 +108,7 @@ const getExpenses = async () => {
   return mintGasCost * gasPrice + mintCost;
 };
 
-type ProcessedWallets = { [prop: `0x${string}`]: true };
+type ProcessedWallets = { [prop: Hex]: true };
 
 const getAccountToMint = async (wallets: EVMWallet[], processedWallets: ProcessedWallets) => {
   const expenses = await getExpenses();

@@ -1,4 +1,5 @@
 import axiosRetry from "axios-retry";
+import { Hex } from "viem";
 import * as chains from "viem/chains";
 import { getFuelReport } from "./fuel";
 import { getProfiles, operationFolder } from "src/libs/configs";
@@ -13,7 +14,7 @@ export async function mainnetReport({ save, params }: { save: boolean; params: s
   const report: JsonObj = {};
   for (const [profileId, profile] of Object.entries(profiles)) {
     try {
-      const address = profile.wallets.evm.address as `0x${string}`;
+      const address = profile.wallets.evm.address as Hex;
       const portfolio = await getFormattedPortfolio(address, chains.mainnet);
       const axiosInstance = await refreshProxy(getRandomArbitrary(10000, 20000));
 

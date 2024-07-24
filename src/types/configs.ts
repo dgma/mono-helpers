@@ -1,3 +1,4 @@
+import { Hex } from "viem";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 
 export type Networks = "btc" | "evm" | "sol" | "tia" | "atom";
@@ -7,7 +8,7 @@ export type NetworkWallet = {
   readonly pkᵻ: string;
 };
 
-export type EVMWallet = { readonly address: `0x${string}`; readonly pkᵻ: `0x${string}` };
+export type EVMWallet = { readonly address: Hex; readonly pkᵻ: Hex };
 
 export type Wallet = {
   readonly [key in Networks]: NetworkWallet;

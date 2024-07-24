@@ -1,3 +1,4 @@
+import { Hex } from "viem";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 
 export type SupportedChains = keyof typeof OKX_WITHDRAW_CHAINS;
@@ -42,7 +43,7 @@ export type OKXNetwork = {
 };
 
 export type WithdrawConfig = {
-  address: `0x${string}`;
+  address: Hex;
   amount: string;
   chain: string;
   fee: string;

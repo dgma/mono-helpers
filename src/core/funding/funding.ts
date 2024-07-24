@@ -1,4 +1,4 @@
-import { formatEther, parseEther, zeroAddress } from "viem";
+import { formatEther, parseEther, zeroAddress, Hex } from "viem";
 import * as chains from "viem/chains";
 import { chainLinkAddresses } from "src/constants/chainlink";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
@@ -74,7 +74,7 @@ const getEligibleFunding = async ({ filters, range, chain, maxFee }: Params) => 
   const evmChainConfig = await EVMNetworksConfig(chain);
   const rawConfig = await Promise.all(
     Object.values(profiles).map(async (profile) => {
-      const address = profile.wallets.evm.address as `0x${string}`;
+      const address = profile.wallets.evm.address as Hex;
       const balance = await publicClient.getBalance({
         address,
       });

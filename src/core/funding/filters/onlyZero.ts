@@ -1,6 +1,6 @@
-import { PublicClient } from "viem";
+import { PublicClient, Hex } from "viem";
 
-export const onlyZero = async (client: PublicClient, address: `0x${string}`) => {
+export const onlyZero = async (client: PublicClient, address: Hex) => {
   const balance = await client.getBalance({
     address,
   });

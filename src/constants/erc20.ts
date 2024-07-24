@@ -1,6 +1,7 @@
+import { Hex } from "viem";
 import { mainnet, scroll } from "viem/chains";
 
-export const TOKENS: { [prop: number]: `0x${string}`[] } = {
+export const TOKENS: { [prop: number]: Hex[] } = {
   [mainnet.id]: [
     "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0", // wstETH
     "0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84", // stETH

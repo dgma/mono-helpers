@@ -1,4 +1,5 @@
 import axiosRetry from "axios-retry";
+import { Hex } from "viem";
 import { scroll } from "viem/chains";
 import { isProfileMinted } from "./canvas";
 import { getLpStats } from "./nuri";
@@ -9,7 +10,7 @@ import { refreshProxy } from "src/libs/proxify";
 import { saveInFolder, getRandomArbitrary } from "src/libs/shared";
 import { logger } from "src/logger";
 
-const refreshAndCall = (index: string, address: `0x${string}`) => async (report: any) => {
+const refreshAndCall = (index: string, address: Hex) => async (report: any) => {
   try {
     const portfolio = await getFormattedPortfolio(address, scroll);
     const axiosInstance = await refreshProxy(getRandomArbitrary(10000, 20000));
@@ -41,7 +42,7 @@ const refreshAndCall = (index: string, address: `0x${string}`) => async (report:
 export async function scrollReport({ save }: { save: boolean }) {
   const profiles = await getProfiles();
   const data = await Object.entries(profiles).reduce(
-    (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address as `0x${string}`)),
+    (promise, [index, value]) => promise.then(refreshAndCall(index, value.wallets.evm.address as Hex)),
     Promise.resolve({}),
   );
   if (save) {
