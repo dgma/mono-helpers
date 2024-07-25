@@ -41,7 +41,25 @@ services:
     logging: *loggin
     secrets:
       - master_key
-  distributeERC:
+  symbioticYT2:
+    image: mono
+    restart: always
+    build:
+      context: .
+    command: ["make", "distributeERC"]
+    logging: *loggin
+    secrets:
+      - master_key
+  karakYT:
+    image: mono
+    restart: always
+    build:
+      context: .
+    command: ["make", "distributeERC"]
+    logging: *loggin
+    secrets:
+      - master_key
+  fuelDust:
     image: mono
     restart: always
     build:
