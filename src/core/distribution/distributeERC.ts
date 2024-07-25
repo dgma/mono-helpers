@@ -2,7 +2,7 @@ import { Hex } from "viem";
 import { Chain } from "viem/chains";
 import { getEVMWallets } from "src/libs/configs";
 import { getBalance, transfer } from "src/libs/erc20";
-import { refreshProxy } from "src/libs/proxify";
+// import { refreshProxy } from "src/libs/proxify";
 import { sleep, getRandomArbitrary } from "src/libs/shared";
 import { logger } from "src/logger";
 
@@ -39,9 +39,9 @@ export const distributeERC = async (chain: Chain, tokenAddress: Hex) => {
       tokenAddress: tokenAddress,
       receiverAddress: item.to,
       amount: item.amount,
-      axiosInstance: await refreshProxy(0),
+      // axiosInstance: await refreshProxy(0),
       chain,
     });
-    await sleep(getRandomArbitrary(3.6e6, 2 * 3.6e6));
+    await sleep(getRandomArbitrary(2 * 3.6e6, 3 * 3.6e6));
   }
 };
