@@ -1,6 +1,6 @@
 {
   "cli": {
-    "cluster_id": "main",
+    "cluster_id": "symbioticYT2",
     "funding": {
       "chain": "eth",
       "filters": [
@@ -16,7 +16,8 @@
     },
     "distribute": {
       "chain": "mainnet",
-      "address": "0xxxxxxx"
+      "token": "0xa2b4c479c98163bbdbd3987a9f3474bb7bc72f84",
+      "miller": "0x0000000000000000000000000000000000000000"
     },
     "fuel": {
       "minDeposit": 30

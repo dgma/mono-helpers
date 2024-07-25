@@ -1,4 +1,5 @@
 import { Hex } from "viem";
+import * as chains from "viem/chains";
 import { OKX_WITHDRAW_CHAINS } from "src/constants/okx";
 
 export type Networks = "btc" | "evm" | "sol" | "tia" | "atom";
@@ -58,6 +59,11 @@ export type AppConfig = {
       readonly depositRange: [number, number];
       readonly lteBalance?: number;
       readonly maxFee: number;
+    };
+    readonly distribute: {
+      readonly chain: keyof typeof chains;
+      readonly token: Hex;
+      readonly miller: Hex;
     };
     readonly fuel: {
       readonly minDeposit: number;

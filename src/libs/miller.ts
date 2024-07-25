@@ -10,7 +10,7 @@ import { EVMWallet } from "src/types/configs";
 
 type distributeERC20Props = {
   chain: Chain;
-  axiosInstance: AxiosInstance;
+  axiosInstance?: AxiosInstance;
   tokenAddress: Hex;
   millerAddress: Hex;
   wallet: EVMWallet;
@@ -18,11 +18,14 @@ type distributeERC20Props = {
   permitValue: bigint;
 };
 
+const getTimestampInSeconds = () => Math.floor(Date.now() / 1000);
+
 export const distributeERC20 = async (props: distributeERC20Props) => {
+  const deadline = BigInt(getTimestampInSeconds() + 4200);
   const permit = await signPermit({
     contractAddress: props.tokenAddress,
     spenderAddress: props.millerAddress,
-    deadline: 120n, // ~10 blocks
+    deadline: deadline,
     chain: props.chain,
     wallet: props.wallet,
     value: props.permitValue,
@@ -34,12 +37,12 @@ export const distributeERC20 = async (props: distributeERC20Props) => {
     address: props.millerAddress,
     abi: MILLER_ABI,
     functionName: "distributeERC20",
-    args: [props.config, props.tokenAddress, props.permitValue, 120n, permit.v, permit.r, permit.s],
+    args: [props.config, props.tokenAddress, props.permitValue, deadline, permit.v, permit.r, permit.s],
     account,
   });
   const txHash = await client.writeContract(request);
   const receipt = await client.waitForTransactionReceipt({
     hash: txHash,
   });
-  logger.debug(`tx receipt: ${receipt}`, { label: "distributeERC20" });
+  logger.debug(`tx hash: ${receipt.transactionHash}`, { label: "distributeERC20" });
 };

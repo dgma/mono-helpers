@@ -41,6 +41,15 @@ services:
     logging: *loggin
     secrets:
       - master_key
+  distributeERC:
+    image: mono
+    restart: always
+    build:
+      context: .
+    command: ["make", "distributeERC"]
+    logging: *loggin
+    secrets:
+      - master_key
 secrets:
   master_key:
     file: ./master_key

@@ -4,6 +4,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { Chain } from "viem/chains";
 import { ERC_20_BASE_ABI } from "src/constants/erc20";
 import { getClient } from "src/libs/clients";
+import { logger } from "src/logger";
 import { EVMWallet } from "src/types/configs";
 
 export type PermitSignature = {
@@ -55,6 +56,9 @@ export const signPermit = async ({
   axiosInstance,
   wallet,
 }: Eip2612Props): Promise<PermitSignature> => {
+  logger.debug(`sign ${value} to spend`, {
+    label: "erc20/permit",
+  });
   const client = await getClient(chain, axiosInstance);
 
   const contractConf = {
@@ -95,12 +99,32 @@ export const signPermit = async ({
     deadline,
   };
 
+  logger.debug(
+    `signature ${JSON.stringify(
+      {
+        // account: privateKeyToAccount(wallet.pkᵻ),
+        message,
+        domain: domainData,
+        primaryType: "Permit",
+        types,
+      },
+      (_, v) => (typeof v === "bigint" ? v.toString() : v),
+    )}`,
+    {
+      label: "erc20/permit",
+    },
+  );
+
   const signature = await client.signTypedData({
     account: privateKeyToAccount(wallet.pkᵻ),
     message,
     domain: domainData,
     primaryType: "Permit",
     types,
+  });
+
+  logger.debug(`signature ${JSON.stringify(signature, (_, v) => (typeof v === "bigint" ? v.toString() : v))}`, {
+    label: "erc20/permit",
   });
   const [r, s, v] = [slice(signature, 0, 32), slice(signature, 32, 64), slice(signature, 64, 65)];
   return { r, s, v: hexToNumber(v) };
