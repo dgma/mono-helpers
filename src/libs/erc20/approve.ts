@@ -30,6 +30,6 @@ export async function approve(params: ApproveSpendingParams) {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  logger.debug(`tx receipt: ${receipt}`, { label: "approve" });
+  logger.info(`tx receipt: ${receipt.transactionHash}`, { label: "erc20/approve" });
   return receipt;
 }

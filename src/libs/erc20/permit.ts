@@ -99,22 +99,6 @@ export const signPermit = async ({
     deadline,
   };
 
-  logger.debug(
-    `signature ${JSON.stringify(
-      {
-        // account: privateKeyToAccount(wallet.pkᵻ),
-        message,
-        domain: domainData,
-        primaryType: "Permit",
-        types,
-      },
-      (_, v) => (typeof v === "bigint" ? v.toString() : v),
-    )}`,
-    {
-      label: "erc20/permit",
-    },
-  );
-
   const signature = await client.signTypedData({
     account: privateKeyToAccount(wallet.pkᵻ),
     message,

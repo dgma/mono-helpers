@@ -30,6 +30,6 @@ export async function transfer(params: TransferProps) {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  logger.debug(`tx receipt: ${receipt.transactionHash}`, { label: "approve" });
+  logger.info(`tx receipt: ${receipt.transactionHash}`, { label: "erc20/transfer" });
   return receipt;
 }

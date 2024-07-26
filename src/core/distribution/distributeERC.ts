@@ -42,6 +42,10 @@ export const distributeERC = async (chain: Chain, tokenAddress: Hex) => {
       // axiosInstance: await refreshProxy(0),
       chain,
     });
-    await sleep(getRandomArbitrary(2 * 3.6e6, 3 * 3.6e6));
+    const time = getRandomArbitrary(2 * 3.6e6, 3 * 3.6e6);
+    logger.info(`sleep for ${time}`, {
+      label: "core/distributeERC",
+    });
+    await sleep(time);
   }
 };
