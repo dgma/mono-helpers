@@ -1,20 +1,21 @@
-import { Hex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
 import { Chain } from "viem/chains";
+import { getClient } from "src/libs/clients";
 import { getEVMWallets } from "src/libs/configs";
-import { getBalance, transfer } from "src/libs/erc20";
 // import { refreshProxy } from "src/libs/proxify";
 import { sleep, getRandomArbitrary } from "src/libs/shared";
 import { logger } from "src/logger";
 
-export const distributeERC = async (chain: Chain, tokenAddress: Hex) => {
+export const distributeNative = async (chain: Chain) => {
   const wallets = await getEVMWallets();
-  const [, value] = await getBalance({
-    walletAddress: wallets[0].address,
-    tokenAddress,
-    chain,
+
+  const client = await getClient(chain);
+
+  const value = await client.getBalance({
+    address: wallets[0].address,
   });
 
-  logger.debug(`token balance of ${wallets[0].address} is ${value}`, { label: "core/distributeERC" });
+  logger.debug(`balance of ${wallets[0].address} is ${value}`, { label: "core/distributeNative" });
 
   let valueLeft = value;
 
@@ -29,22 +30,23 @@ export const distributeERC = async (chain: Chain, tokenAddress: Hex) => {
 
   if (value - valueLeft !== config.reduce((acc, { amount }) => acc + amount, 0n)) {
     logger.error(`config creation error`, {
-      label: "core/distributeERC",
+      label: "core/distributeNative",
     });
   }
 
   for (const item of config) {
-    await transfer({
-      wallet: wallets[0],
-      tokenAddress: tokenAddress,
-      receiverAddress: item.to,
-      amount: item.amount,
-      // axiosInstance: await refreshProxy(0),
+    const tx = await client.sendTransaction({
+      account: privateKeyToAccount(wallets[0].pkᵻ),
+      to: item.to,
+      value: item.amount,
       chain,
+    });
+    logger.info(`tx send ${tx}`, {
+      label: "core/distributeNative",
     });
     const time = getRandomArbitrary(2 * 3.6e6, 3 * 3.6e6);
     logger.info(`sleep for ${time}`, {
-      label: "core/distributeERC",
+      label: "core/distributeNative",
     });
     await sleep(time);
   }

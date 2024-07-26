@@ -30,9 +30,7 @@ encrypt-secrets :; export FILE=.secretsrc && export OUTPUT=.secrets && npx tsx s
 
 service?=fuel
 
-up :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose up -d $(service) && unset REPLY && docker compose logs -f $(service); rm -rf master_key
-
-up-all :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose up -d && unset REPLY && docker compose logs -f; rm -rf master_key
+up :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose run --rm mono make $(cmd) && unset REPLY && docker compose logs -f; rm -rf master_key
 
 # cli
 list :; npx tsx src/cli/list.ts
@@ -57,6 +55,6 @@ recover :; npx tsx src/cli/profiles.ts
 
 distributeERC :; npx tsx src/cli/distributeERC.ts
 
-cli :; npx tsx src/cli/$(c).ts
+distributeNative :; npx tsx src/cli/distributeNative.ts
 
 -include ${FCT_PLUGIN_PATH}/makefile-external
