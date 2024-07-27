@@ -1,6 +1,6 @@
 {
   "cli": {
-    "cluster_id": "fuelDust",
+    "cluster_id": "fuelDust2",
     "funding": {
       "chain": "eth",
       "filters": [

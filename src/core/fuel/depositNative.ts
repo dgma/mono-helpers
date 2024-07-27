@@ -3,17 +3,17 @@ import { privateKeyToAccount } from "viem/accounts";
 import * as chains from "viem/chains";
 import { chainLinkAddresses } from "src/constants/chainlink";
 import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fuel";
+import { MS_IN_HOUR } from "src/constants/time";
 import { getPrice } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
-import Clock from "src/libs/clock";
 import { getEVMWallets } from "src/libs/configs";
+import { sleepForProperGasPrice } from "src/libs/evm";
 import { refreshProxy } from "src/libs/proxify";
-import { getRandomArbitrary, loopUntil } from "src/libs/shared";
+import { getRandomArbitrary, sleep } from "src/libs/shared";
 import { logger } from "src/logger";
 import { EVMWallet } from "src/types/configs";
 
 const chain = chains.mainnet;
-const localClock = new Clock();
 
 const depositNative = async (wallet: EVMWallet, toDeposit: bigint) => {
   const axiosInstance = await refreshProxy();
@@ -87,13 +87,7 @@ const getExpenses = async () => {
 
 // TODO: pass gas config
 const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: number) => {
-  await loopUntil(
-    async () => {
-      const gasPrice = await (await getPublicClient(chains.mainnet)).getGasPrice();
-      return gasPrice < 8000000000n; // 8 gwei
-    },
-    5 * 60 * 1000,
-  );
+  await sleepForProperGasPrice();
   const expenses = await getExpenses();
   const ethPrice = await getPrice(
     await getPublicClient(chains.mainnet),
@@ -114,8 +108,11 @@ export async function initNativeFuelDeposits(minDeposit: number) {
 
   while (accountToDeposit !== undefined) {
     await depositNative(accountToDeposit.wallet, accountToDeposit.toDeposit);
-    localClock.markTime();
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
-    await localClock.sleepMax(getRandomArbitrary(1 * 3600000, 2 * 3600000));
+    const time = getRandomArbitrary(1 * MS_IN_HOUR, 2 * MS_IN_HOUR);
+    logger.info(`sleep for ${time}`, {
+      label: "core/depositNative",
+    });
+    await sleep(time);
   }
 }

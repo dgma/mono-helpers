@@ -1,9 +1,10 @@
 import { parseEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { Chain } from "viem/chains";
+import { MS_IN_HOUR } from "src/constants/time";
 import { getClient } from "src/libs/clients";
 import { getEVMWallets } from "src/libs/configs";
-// import { refreshProxy } from "src/libs/proxify";
+import { sleepForProperGasPrice } from "src/libs/evm";
 import { sleep, getRandomArbitrary } from "src/libs/shared";
 import { logger } from "src/logger";
 
@@ -38,6 +39,19 @@ export const distributeNative = async (chain: Chain) => {
   }
 
   for (const item of config) {
+    logger.info(`begin operation for ${item.to}`, {
+      label: "core/distributeNative",
+    });
+    const balance = await client.getBalance({
+      address: item.to,
+    });
+    if (balance > 0n) {
+      logger.info(`has already processed, skip`, {
+        label: "core/distributeNative",
+      });
+      continue;
+    }
+    await sleepForProperGasPrice();
     const tx = await client.sendTransaction({
       account: privateKeyToAccount(wallets[0].pkᵻ),
       to: item.to,
@@ -47,7 +61,7 @@ export const distributeNative = async (chain: Chain) => {
     logger.info(`tx send ${tx}`, {
       label: "core/distributeNative",
     });
-    const time = getRandomArbitrary(2 * 3.6e6, 3 * 3.6e6);
+    const time = getRandomArbitrary(2 * MS_IN_HOUR, 3 * MS_IN_HOUR);
     logger.info(`sleep for ${time}`, {
       label: "core/distributeNative",
     });
