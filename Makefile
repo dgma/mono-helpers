@@ -30,7 +30,7 @@ encrypt-secrets :; export FILE=.secretsrc && export OUTPUT=.secrets && npx tsx s
 
 service?=fuel
 
-up :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose run --rm mono make $(cmd) && unset REPLY && docker compose logs -f; rm -rf master_key
+up :; read -s -r -e -p "MASTER_KEY: " && echo $$REPLY > master_key && docker compose run --rm -d mono make $(cmd) && unset REPLY && docker compose logs -f; rm -rf master_key
 
 # cli
 list :; npx tsx src/cli/list.ts
