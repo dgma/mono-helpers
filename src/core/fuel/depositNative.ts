@@ -111,7 +111,7 @@ export async function initNativeFuelDeposits(minDeposit: number) {
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
     const time = getRandomArbitrary(1 * MS_IN_HOUR, 2 * MS_IN_HOUR);
     logger.info(`sleep for ${time}`, {
-      label: "core/depositNative",
+      label: "fuel::depositNative",
     });
     await sleep(time);
   }

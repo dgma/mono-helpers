@@ -43,7 +43,7 @@ funding :; npx tsx src/cli/funding.ts
 
 fuelNative :; npx tsx src/cli/fuelNative.ts
 
-fuelERC :; npx tsx src/cli/fuelNative.ts
+fuelERC :; npx tsx src/cli/fuelERC.ts
 
 scroll-kelp :; npx tsx src/cli/scroll.kelp.ts
 

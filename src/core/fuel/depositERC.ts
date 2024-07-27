@@ -60,7 +60,7 @@ export async function initERCFuelDeposits(token: Hex) {
 
     const time = getRandomArbitrary(2 * MS_IN_HOUR, 3 * MS_IN_HOUR);
     logger.info(`sleep for ${time}`, {
-      label: "core/distributeERC",
+      label: "fuel::depositERC",
     });
     await sleep(time);
   }
