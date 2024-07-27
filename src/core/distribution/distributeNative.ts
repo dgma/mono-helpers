@@ -7,8 +7,6 @@ import { getEVMWallets } from "src/libs/configs";
 import { sleep, getRandomArbitrary } from "src/libs/shared";
 import { logger } from "src/logger";
 
-const MIN_SPEND = parseEther("0.0015");
-
 export const distributeNative = async (chain: Chain) => {
   const wallets = await getEVMWallets();
 
@@ -24,7 +22,8 @@ export const distributeNative = async (chain: Chain) => {
 
   const config = wallets.slice(1).map(({ address }, index) => {
     const amount = (valueLeft / 100n) * BigInt(index + 1);
-    const amountToSpend = amount > MIN_SPEND ? amount : MIN_SPEND;
+    const minSpend = parseEther(`0.00${getRandomArbitrary(13, 175)}`);
+    const amountToSpend = amount > minSpend ? amount : minSpend;
     valueLeft -= amountToSpend;
     return {
       to: address,
