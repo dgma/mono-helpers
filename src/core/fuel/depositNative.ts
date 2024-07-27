@@ -6,7 +6,7 @@ import { FUEL_POINTS_CONTRACT_ABI, FUEL_POINTS_CONTRACT } from "src/constants/fu
 import { getPrice } from "src/libs/chainlink";
 import { getClient, getPublicClient } from "src/libs/clients";
 import Clock from "src/libs/clock";
-import { getProfiles } from "src/libs/configs";
+import { getEVMWallets } from "src/libs/configs";
 import { refreshProxy } from "src/libs/proxify";
 import { getRandomArbitrary, loopUntil } from "src/libs/shared";
 import { logger } from "src/logger";
@@ -15,7 +15,7 @@ import { EVMWallet } from "src/types/configs";
 const chain = chains.mainnet;
 const localClock = new Clock();
 
-const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
+const depositNative = async (wallet: EVMWallet, toDeposit: bigint) => {
   const axiosInstance = await refreshProxy();
   const walletClient = await getClient(chain, axiosInstance);
   const account = privateKeyToAccount(wallet.pkᵻ);
@@ -31,7 +31,7 @@ const deposit = async (wallet: EVMWallet, toDeposit: bigint) => {
   const receipt = await walletClient.waitForTransactionReceipt({
     hash: txHash,
   });
-  logger.info(`tx hash: ${receipt.transactionHash}`, { label: "fuel::deposit" });
+  logger.info(`tx hash: ${receipt.transactionHash}`, { label: "fuel::depositNative" });
   return receipt;
 };
 
@@ -103,20 +103,17 @@ const getAccountToDeposit = async (decodedEVMAccounts: EVMWallet[], minDeposit: 
   const eligibleAccounts = await Promise.all(
     decodedEVMAccounts.map(prepare({ expenses, ethPrice, minDeposit: parseEther(String(minDeposit)) })),
   ).then((accounts) => accounts.filter(({ isEligible }) => isEligible));
-  logger.info(`accounts to deposit ${eligibleAccounts.length}`, { label: "fuel::deposit" });
+  logger.info(`accounts to deposit ${eligibleAccounts.length}`, { label: "fuel::depositNative" });
   return eligibleAccounts[0];
 };
 
-export async function initFuelDeposits(minDeposit: number) {
-  const profiles = await getProfiles();
-  const decodedEVMAccounts = Object.values(profiles).map(({ wallets }) => ({
-    ...(wallets.evm as EVMWallet),
-  }));
+export async function initNativeFuelDeposits(minDeposit: number) {
+  const decodedEVMAccounts = await getEVMWallets();
 
   let accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
 
   while (accountToDeposit !== undefined) {
-    await deposit(accountToDeposit.wallet, accountToDeposit.toDeposit);
+    await depositNative(accountToDeposit.wallet, accountToDeposit.toDeposit);
     localClock.markTime();
     accountToDeposit = await getAccountToDeposit(decodedEVMAccounts, minDeposit);
     await localClock.sleepMax(getRandomArbitrary(1 * 3600000, 2 * 3600000));

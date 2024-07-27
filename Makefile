@@ -41,7 +41,9 @@ decrypt :; export FILE=$(in) && export OUTPUT=$(out) && npx tsx src/cli/decrypt.
 
 funding :; npx tsx src/cli/funding.ts
 
-fuel :; npx tsx src/cli/fuel.ts
+fuelNative :; npx tsx src/cli/fuelNative.ts
+
+fuelERC :; npx tsx src/cli/fuelNative.ts
 
 scroll-kelp :; npx tsx src/cli/scroll.kelp.ts
 

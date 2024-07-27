@@ -67,6 +67,7 @@ export type AppConfig = {
     };
     readonly fuel: {
       readonly minDeposit: number;
+      readonly token: Hex;
     };
     readonly scroll: {
       readonly kelp: {

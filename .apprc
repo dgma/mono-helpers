@@ -1,6 +1,6 @@
 {
   "cli": {
-    "cluster_id": "fuelDust2",
+    "cluster_id": "fuelDust",
     "funding": {
       "chain": "eth",
       "filters": [
@@ -20,7 +20,8 @@
       "miller": "0x0000000000000000000000000000000000000000"
     },
     "fuel": {
-      "minDeposit": 30
+      "minDeposit": 30,
+      "token": "0x8c9532a60E0E7C6BbD2B2c1303F63aCE1c3E9811"
     },
     "scroll": {
       "kelp": {

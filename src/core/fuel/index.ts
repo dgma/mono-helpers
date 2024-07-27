@@ -1,1 +1,2 @@
-export { initFuelDeposits } from "./deposit.fuel";
+export { initNativeFuelDeposits } from "./depositNative";
+export { initERCFuelDeposits } from "./depositERC";
