@@ -1,6 +1,6 @@
 {
   "cli": {
-    "cluster_id": "symbioticYT2",
+    "cluster_id": "fuelDust2",
     "funding": {
       "chain": "eth",
       "filters": [
@@ -16,7 +16,7 @@
     },
     "distribute": {
       "chain": "mainnet",
-      "token": "0xa2b4c479c98163bbdbd3987a9f3474bb7bc72f84",
+      "token": "0x8c9532a60E0E7C6BbD2B2c1303F63aCE1c3E9811",
       "miller": "0x0000000000000000000000000000000000000000"
     },
     "fuel": {
