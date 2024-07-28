@@ -43,9 +43,6 @@ export async function initERCFuelDeposits(token: Hex) {
   const EVMWallets = await getEVMWallets();
 
   for (const wallet of EVMWallets) {
-    if (wallet === EVMWallets[0]) {
-      continue;
-    }
     const [, balance] = await getBalance({
       walletAddress: wallet.address,
       tokenAddress: token,
