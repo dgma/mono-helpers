@@ -28,7 +28,6 @@ const approveAndDepositERC = async (wallet: EVMWallet, token: Hex, amount: bigin
     abi: FUEL_POINTS_CONTRACT_ABI,
     functionName: "deposit",
     args: [token, amount, 0x0],
-    value: amount,
     account,
   });
   const txHash = await walletClient.writeContract(request);
