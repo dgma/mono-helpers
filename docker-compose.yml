@@ -6,6 +6,8 @@ services:
     restart: always
     build:
       context: .
+    volumes:
+      - .apprc:/app/.apprc
     secrets:
       - master_key
     logging: &loggin
