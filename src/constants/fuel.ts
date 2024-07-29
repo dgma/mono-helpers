@@ -1,4 +1,4 @@
-export const FUEL_POINTS_CONTRACT = "0x19b5cc75846BF6286d599ec116536a333C4C2c14";
+export const FUEL_POINTS_CONTRACT = "0x19b5cc75846BF6286d599ec116536a333C4C2c14" as const;
 
 export const FUEL_POINTS_CONTRACT_ABI = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },

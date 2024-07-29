@@ -34,9 +34,6 @@
           "fuel"
         ],
         "save": true
-      },
-      "scroll": {
-        "save": true
       }
     },
     "profiles": {
